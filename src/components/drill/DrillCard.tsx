@@ -1,15 +1,21 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { FadeUp } from '@/lib/motion'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { CheckCircle2, XCircle, AlertTriangle, ChevronRight } from 'lucide-react'
+import { CheckCircle2, XCircle, AlertTriangle } from 'lucide-react'
 import type { DrillItem, DrillResultStatus } from '@/lib/drill/drill-types'
-import { TASK_META } from '@/lib/drill/drill-types'
-import { checkAndRecord } from '@/lib/drill/drill-store'
+import { TASK_META, computeResultStatus } from '@/lib/drill/drill-types'
 import { useDrillProgressStore } from '@/lib/drill/drill-store'
+import {
+  getVisibleMechanismChoices,
+  isMechanismCorrect,
+  getCorrectNormalizedMechanismText,
+  getSelectedNormalizedMechanismText,
+  getMechanismSupplementaryHint,
+} from '@/lib/drill/drill-mechanism-normalizer'
 
 type Props = {
   item: DrillItem
@@ -27,25 +33,38 @@ export default function DrillCard({ item, index, totalInSession, onCheck }: Prop
   const [checked, setChecked] = useState(false)
   const [resultStatus, setResultStatus] = useState<DrillResultStatus | null>(null)
 
+  // Use normalized mechanism choices
+  const visibleMechanisms = useMemo(() => getVisibleMechanismChoices(item), [item])
+  const correctMechNorm = useMemo(() => getCorrectNormalizedMechanismText(item), [item])
+  const supplementaryHint = useMemo(() => getMechanismSupplementaryHint(item), [item])
+
   const canCheck = selectedAnswerId !== null && selectedMechanismId !== null && !checked
 
   const handleCheck = useCallback(() => {
     if (!selectedAnswerId || !selectedMechanismId) return
 
-    const status = checkAndRecord(
-      item.id,
-      item.taskNumber,
-      item.correctAnswerId,
-      item.correctMechanismId,
+    const answerCorrect = selectedAnswerId === item.correctAnswerId
+    const mechanismCorrect = isMechanismCorrect(item, selectedMechanismId)
+    const status = computeResultStatus(answerCorrect, mechanismCorrect)
+
+    recordResult({
+      itemId: item.id,
+      taskNumber: item.taskNumber,
       selectedAnswerId,
       selectedMechanismId,
-      recordResult
-    )
+      status,
+      checkedAt: Date.now(),
+    })
 
     setResultStatus(status)
     setChecked(true)
     onCheck(status)
   }, [selectedAnswerId, selectedMechanismId, item, recordResult, onCheck])
+
+  // Get selected mechanism display text for results
+  const selectedMechDisplayText = selectedMechanismId
+    ? getSelectedNormalizedMechanismText(item, selectedMechanismId)
+    : ''
 
   return (
     <Card className="overflow-hidden">
@@ -115,16 +134,16 @@ export default function DrillCard({ item, index, totalInSession, onCheck }: Prop
           </div>
         </div>
 
-        {/* Mechanism choices */}
+        {/* Mechanism choices (normalized) */}
         <div className="space-y-2">
           <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
             Почему?
           </label>
           <div className="flex flex-wrap gap-2">
-            {item.mechanismChoices.map((choice) => {
+            {visibleMechanisms.map((choice) => {
               const isSelected = selectedMechanismId === choice.id
-              const isCorrect = checked && choice.id === item.correctMechanismId
-              const isWrong = checked && isSelected && choice.id !== item.correctMechanismId
+              const isCorrect = checked && choice.text === correctMechNorm
+              const isWrong = checked && isSelected && choice.text !== correctMechNorm
 
               let className = 'transition-all text-xs '
               if (isCorrect) {
@@ -177,8 +196,13 @@ export default function DrillCard({ item, index, totalInSession, onCheck }: Prop
                     Ответ: <strong>{item.correctAnswerText}</strong>
                   </p>
                   <p className="text-xs text-emerald-600">
-                    Механизм: <strong>{item.correctMechanismText}</strong>
+                    Механизм: <strong>{correctMechNorm}</strong>
                   </p>
+                  {supplementaryHint && (
+                    <p className="text-xs text-emerald-500 mt-0.5 italic">
+                      {supplementaryHint}
+                    </p>
+                  )}
                   {item.explanation && (
                     <p className="text-xs text-emerald-600 mt-1">
                       {item.explanation}
@@ -202,13 +226,16 @@ export default function DrillCard({ item, index, totalInSession, onCheck }: Prop
                     </p>
                     <p className="text-xs text-amber-600">
                       Твой механизм:{' '}
-                      <strong>
-                        {item.mechanismChoices.find((c) => c.id === selectedMechanismId)?.text}
-                      </strong>
+                      <strong>{selectedMechDisplayText}</strong>
                     </p>
                     <p className="text-xs text-amber-600">
-                      Правильный механизм: <strong>{item.correctMechanismText}</strong>
+                      Правильный механизм: <strong>{correctMechNorm}</strong>
                     </p>
+                    {supplementaryHint && (
+                      <p className="text-xs text-amber-500 mt-0.5 italic">
+                        {supplementaryHint}
+                      </p>
+                    )}
                   </div>
                 </div>
                 {item.explanation && (
@@ -241,8 +268,13 @@ export default function DrillCard({ item, index, totalInSession, onCheck }: Prop
                       Правильный ответ: <strong>{item.correctAnswerText}</strong>
                     </p>
                     <p className="text-xs text-rose-600">
-                      Правильный механизм: <strong>{item.correctMechanismText}</strong>
+                      Правильный механизм: <strong>{correctMechNorm}</strong>
                     </p>
+                    {supplementaryHint && (
+                      <p className="text-xs text-rose-500 mt-0.5 italic">
+                        {supplementaryHint}
+                      </p>
+                    )}
                   </div>
                 </div>
                 {item.explanation && (

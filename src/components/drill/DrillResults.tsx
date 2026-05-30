@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { CheckCircle2, XCircle, AlertTriangle, RotateCcw, ArrowRight, Home } from 'lucide-react'
 import type { DrillItem, DrillMode, SessionItemResult, DrillResultStatus } from '@/lib/drill/drill-types'
 import { TASK_META, DRILL_MODE_CONFIG } from '@/lib/drill/drill-types'
+import { getCorrectNormalizedMechanismText } from '@/lib/drill/drill-mechanism-normalizer'
 
 type Props = {
   items: DrillItem[]
@@ -41,23 +42,25 @@ export default function DrillResults({
   const answerAccuracy = total > 0 ? Math.round(((knownCount + guessedCount) / total) * 100) : 0
   const mechanismAccuracy = total > 0 ? Math.round((knownCount / total) * 100) : 0
 
-  // Find weak mechanisms
+  // Find weak mechanisms (using normalized mechanism text)
   const mechanismMistakes: Record<string, { wrong: number; guessed: number }> = {}
   for (const result of results) {
     const item = items.find((i) => i.id === result.itemId)
     if (!item) continue
 
+    const normMech = getCorrectNormalizedMechanismText(item)
+
     if (result.status === 'wrong') {
-      if (!mechanismMistakes[item.correctMechanismText]) {
-        mechanismMistakes[item.correctMechanismText] = { wrong: 0, guessed: 0 }
+      if (!mechanismMistakes[normMech]) {
+        mechanismMistakes[normMech] = { wrong: 0, guessed: 0 }
       }
-      mechanismMistakes[item.correctMechanismText].wrong++
+      mechanismMistakes[normMech].wrong++
     }
     if (result.status === 'guessed') {
-      if (!mechanismMistakes[item.correctMechanismText]) {
-        mechanismMistakes[item.correctMechanismText] = { wrong: 0, guessed: 0 }
+      if (!mechanismMistakes[normMech]) {
+        mechanismMistakes[normMech] = { wrong: 0, guessed: 0 }
       }
-      mechanismMistakes[item.correctMechanismText].guessed++
+      mechanismMistakes[normMech].guessed++
     }
   }
 

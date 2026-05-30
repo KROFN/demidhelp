@@ -112,6 +112,8 @@ export const useDrillProgressStore = create<DrillProgressState>()(
 )
 
 // ─── Helper: compute status and record ─────────────────────────────────────
+// NOTE: DrillCard now computes status inline using isMechanismCorrect from
+// drill-mechanism-normalizer. This helper remains for any external callers.
 
 export function checkAndRecord(
   itemId: string,
@@ -123,6 +125,8 @@ export function checkAndRecord(
   recordResult: (r: SessionItemResult) => void
 ): DrillResultStatus {
   const answerCorrect = selectedAnswerId === correctAnswerId
+  // Legacy: raw ID comparison — callers should use DrillCard's
+  // normalized check instead for tasks 4/5
   const mechanismCorrect = selectedMechanismId === correctMechanismId
   const status = computeResultStatus(answerCorrect, mechanismCorrect)
 
