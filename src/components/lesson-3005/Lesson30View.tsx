@@ -106,7 +106,15 @@ const colorClasses: Record<string, { bg: string; text: string; badge: string }> 
 }
 
 // ─── Main block IDs used for completion check ────────────────────────────────
-const MAIN_BLOCK_IDS: BlockId30[] = ['block12', 'block11', 'block14', 'block2325']
+const MAIN_BLOCK_IDS: BlockId30[] = ['block12', 'block11', 'block14', 'block2325', 'homework']
+
+const BLOCK_TIMES: Record<BlockId30, string> = {
+  block12: '5–45',
+  block11: '45–75',
+  block14: '75–105',
+  block2325: '105–115',
+  homework: '115–120',
+}
 
 // ─── Error Review Component ─────────────────────────────────────────────────
 
@@ -214,7 +222,7 @@ export default function Lesson30View() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   // Overall progress calculation
-  const totalBlocks = 4
+  const totalBlocks = MAIN_BLOCK_IDS.length
   const completedMainBlocks = MAIN_BLOCK_IDS.filter((id) => completedBlocks.includes(id)).length
   const overallProgress = Math.round((completedMainBlocks / totalBlocks) * 100)
   const allMainBlocksCompleted = completedMainBlocks === totalBlocks
@@ -279,10 +287,10 @@ export default function Lesson30View() {
                   <GraduationCap className="h-8 w-8 text-emerald-600" />
                 </motion.div>
                 <CardTitle className="text-2xl sm:text-3xl font-bold tracking-tight">
-                  {LESSON_30_META.title}
+                  Сегодня закрываем грязную орфографию
                 </CardTitle>
-                <p className="text-muted-foreground mt-2 text-lg">
-                  {LESSON_30_META.date}
+                <p className="text-muted-foreground mt-2 text-base">
+                  ЕГЭ русский — урок 30.05.2026 · Орфография без угадайки
                 </p>
               </CardHeader>
 
@@ -294,48 +302,21 @@ export default function Lesson30View() {
                     <div>
                       <h3 className="font-semibold text-emerald-900 mb-1">Цель урока</h3>
                       <p className="text-emerald-800 text-sm leading-relaxed">
-                        {LESSON_30_META.goal}
+                        Перестать выбирать букву по ощущению и решать через цепочку: форма слова → часть речи → правило → ответ.
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {/* What we cover */}
                 <div>
                   <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                    Сегодня проходим
+                    Сегодня не учим всё подряд
                   </h3>
-                  <ul className="space-y-2">
-                    {LESSON_30_META.todayWeCover.map((item, i) => (
-                      <motion.li
-                        key={i}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.3 + i * 0.08 }}
-                        className="flex items-start gap-2 text-sm"
-                      >
-                        <ChevronRight className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
-                        <span>{item}</span>
-                      </motion.li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* What we don't cover */}
-                <div>
-                  <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-                    <XCircle className="h-4 w-4 text-rose-500" />
-                    Сегодня НЕ трогаем
-                  </h3>
-                  <ul className="space-y-2">
-                    {LESSON_30_META.todayWeDont.map((item, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <span className="text-rose-400 mt-0.5">—</span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
+                    <p>Закрываем три задания, где чаще всего начинается угадайка: №12, №11 и №14.</p>
+                    <p>В конце — короткая добивка №23–25 без новой теории и без раздувания урока.</p>
+                  </div>
                 </div>
 
                 <Separator />
@@ -353,7 +334,7 @@ export default function Lesson30View() {
                     Блоки урока
                   </h3>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {BLOCKS.map((block, i) => {
+                    {BLOCKS.map((block) => {
                       const c = colorClasses[block.color]
                       return (
                         <div
@@ -363,7 +344,10 @@ export default function Lesson30View() {
                           <div className={`w-7 h-7 rounded-md ${c.bg} ${c.text} flex items-center justify-center shrink-0`}>
                             {block.icon}
                           </div>
-                          <span className="text-xs font-medium truncate">{block.shortLabel}</span>
+                          <div className="min-w-0">
+                            <span className="block truncate text-xs font-medium">{block.shortLabel}</span>
+                            <span className="block text-[11px] text-muted-foreground">{BLOCK_TIMES[block.id]} мин</span>
+                          </div>
                         </div>
                       )
                     })}
@@ -428,16 +412,24 @@ export default function Lesson30View() {
                 <div className={`w-7 h-7 rounded-md ${c.bg} ${c.text} flex items-center justify-center shrink-0`}>
                   {currentBlock.icon}
                 </div>
-                <span className="text-sm font-semibold truncate">{currentBlock.shortLabel}</span>
+                <div className="min-w-0">
+                  <span className="block truncate text-xs text-muted-foreground">
+                    ЕГЭ русский — урок 30.05.2026
+                  </span>
+                  <span className="block truncate text-sm font-semibold">Орфография без угадайки</span>
+                </div>
                 {isCompleted && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />}
                 {hasErrors && <AlertCircle className="h-3.5 w-3.5 text-rose-500 shrink-0" />}
               </div>
             </div>
 
             {/* Right: step counter */}
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex flex-col items-end gap-0.5 shrink-0">
               <span className="text-xs text-muted-foreground">
-                {currentBlock.shortLabel} ({activeStep + 1}/{totalSteps})
+                Пройдено: {completedMainBlocks}/{totalBlocks}
+              </span>
+              <span className="hidden text-xs text-muted-foreground sm:inline">
+                Текущий блок: {Math.min(activeStep + 1, totalBlocks)}/{totalBlocks}
               </span>
             </div>
           </div>
@@ -536,7 +528,7 @@ export default function Lesson30View() {
                       Урок завершён!
                     </h2>
                     <p className="text-muted-foreground mt-1">
-                      Все 4 основных блока пройдены
+                      Все 5 блоков пройдены
                     </p>
                   </motion.div>
 

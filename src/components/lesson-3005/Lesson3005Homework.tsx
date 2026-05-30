@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   ClipboardList,
   CheckCircle2,
-  ExternalLink,
   ListChecks,
   AlertTriangle,
   BookOpen,
@@ -225,26 +224,6 @@ export default function Lesson3005Homework() {
           </Card>
         </motion.div>
       </AnimatePresence>
-
-      {/* FIPI bank link */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <ExternalLink className="size-5" />
-            Банк заданий ФИПИ
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <a
-            href="https://ege.fipi.ru/bank/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-          >
-            Перейти на ege.fipi.ru/bank →
-          </a>
-        </CardContent>
-      </Card>
 
       <Separator />
 
