@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useCallback, useMemo } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { FadeUp, SlideIn } from '@/lib/motion'
 import {
   BookOpen,
   CheckCircle2,
@@ -69,18 +69,12 @@ function Algorithm22Panel() {
           <CardContent className="pt-0 pb-3 px-3">
             <ol className="space-y-2">
               {steps.map((step, i) => (
-                <motion.li
-                  key={i}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.08 }}
-                  className="flex gap-2 text-sm text-teal-800 dark:text-teal-300"
-                >
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-teal-200 dark:bg-teal-800 text-teal-700 dark:text-teal-300 flex items-center justify-center text-xs font-bold">
-                    {i + 1}
-                  </span>
-                  <span className="pt-0.5">{step}</span>
-                </motion.li>
+                <SlideIn key={i} direction={-1} delay={i * 0.08} duration={0.25} className="flex gap-2 text-sm text-teal-800 dark:text-teal-300">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-teal-200 dark:bg-teal-800 text-teal-700 dark:text-teal-300 flex items-center justify-center text-xs font-bold">
+                  {i + 1}
+                </span>
+                <span className="pt-0.5">{step}</span>
+              </SlideIn>
               ))}
             </ol>
           </CardContent>
@@ -251,14 +245,7 @@ function RecognitionByTask() {
             Показать ответ
           </Button>
         ) : (
-          <AnimatePresence>
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-3"
-            >
+          <FadeUp duration={0.3} className="space-y-3">
               <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 p-3">
                 <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 mb-1">
                   Ответ:
@@ -286,8 +273,7 @@ function RecognitionByTask() {
                   Все задания просмотрены!
                 </p>
               )}
-            </motion.div>
-          </AnimatePresence>
+          </FadeUp>
         )}
       </CardContent>
     </Card>
@@ -430,14 +416,7 @@ function RecognitionTrainer() {
         ) : (
           <div className="space-y-3">
             {/* Correct answers */}
-            <AnimatePresence>
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-3"
-              >
+            <FadeUp duration={0.3} className="space-y-3">
                 <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 p-3 space-y-2">
                   <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
                     Правильное определение:
@@ -462,8 +441,7 @@ function RecognitionTrainer() {
                     {state.currentItem.difference}
                   </p>
                 </div>
-              </motion.div>
-            </AnimatePresence>
+            </FadeUp>
 
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">
@@ -546,17 +524,8 @@ export default function Block22IVS() {
         })}
       </div>
 
-      <AnimatePresence mode="wait">
-        {/* Theory Section */}
-        {activeSection === 'theory' && (
-          <motion.div
-            key="theory"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-4"
-          >
+      {activeSection === 'theory' && (
+        <FadeUp key="theory" duration={0.3} className="space-y-4">
             {/* Algorithm 22 — inside theory tab */}
             <Algorithm22Panel />
 
@@ -649,37 +618,22 @@ export default function Block22IVS() {
                 {block22Content.hintAboutAlgorithm}
               </AlertDescription>
             </Alert>
-          </motion.div>
-        )}
+        </FadeUp>
+      )}
 
-        {/* Recognition Section */}
-        {activeSection === 'recognition' && (
-          <motion.div
-            key="recognition"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-4"
-          >
+      {/* Recognition Section */}
+      {activeSection === 'recognition' && (
+        <FadeUp key="recognition" duration={0.3} className="space-y-4">
             <RecognitionByTask />
-          </motion.div>
-        )}
+        </FadeUp>
+      )}
 
-        {/* Trainer Section */}
-        {activeSection === 'trainer' && (
-          <motion.div
-            key="trainer"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-4"
-          >
+      {/* Trainer Section */}
+      {activeSection === 'trainer' && (
+        <FadeUp key="trainer" duration={0.3} className="space-y-4">
             <RecognitionTrainer />
-          </motion.div>
-        )}
-      </AnimatePresence>
+        </FadeUp>
+      )}
 
       <Separator />
 

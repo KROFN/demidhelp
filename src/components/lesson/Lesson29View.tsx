@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { FadeUp, Pop, SlideIn } from '@/lib/motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
@@ -274,22 +274,12 @@ export default function Lesson29View() {
     return (
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100">
         <main className="flex-1 flex items-center justify-center p-4 sm:p-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="max-w-2xl w-full"
-          >
+          <FadeUp duration={0.6} className="max-w-2xl w-full">
             <Card className="border-0 shadow-xl">
               <CardHeader className="text-center pb-4">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                  className="mx-auto mb-4 w-16 h-16 rounded-2xl bg-emerald-100 flex items-center justify-center"
-                >
+                <Pop delay={0.2} className="mx-auto mb-4 w-16 h-16 rounded-2xl bg-emerald-100 flex items-center justify-center">
                   <GraduationCap className="h-8 w-8 text-emerald-600" />
-                </motion.div>
+                </Pop>
                 <CardTitle className="text-2xl sm:text-3xl font-bold tracking-tight">
                   {LESSON_META.title}
                 </CardTitle>
@@ -320,16 +310,10 @@ export default function Lesson29View() {
                   </h3>
                   <ul className="space-y-2">
                     {LESSON_META.todayWeCover.map((item, i) => (
-                      <motion.li
-                        key={i}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.3 + i * 0.08 }}
-                        className="flex items-start gap-2 text-sm"
-                      >
+                      <SlideIn key={i} direction={-1} delay={0.3 + i * 0.08} className="flex items-start gap-2 text-sm">
                         <ChevronRight className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                         <span>{item}</span>
-                      </motion.li>
+                      </SlideIn>
                     ))}
                   </ul>
                 </div>
@@ -383,11 +367,7 @@ export default function Lesson29View() {
                 </div>
 
                 {/* Start button */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.8 }}
-                >
+                <FadeUp delay={0.8}>
                   <Button
                     onClick={startLesson}
                     size="lg"
@@ -396,10 +376,10 @@ export default function Lesson29View() {
                     Начать урок
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
-                </motion.div>
+                </FadeUp>
               </CardContent>
             </Card>
-          </motion.div>
+          </FadeUp>
         </main>
 
         <footer className="py-4 text-center text-xs text-muted-foreground border-t bg-white">
@@ -516,49 +496,28 @@ export default function Lesson29View() {
 
       {/* ─── Content area ──────────────────────────────────────────────────── */}
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-6">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentBlock.id}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.25 }}
-          >
+        <FadeUp key={currentBlock.id} duration={0.25}>
             {isCompletionStep ? (
               /* ─── Lesson Completion Screen ────────────────────────────── */
               <Card className="border-0 shadow-lg">
                 <CardContent className="py-10 px-6 text-center space-y-6">
                   {/* Celebration icon */}
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.15, type: 'spring', stiffness: 200 }}
-                    className="mx-auto w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center"
-                  >
+                  <Pop delay={0.15} className="mx-auto w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center">
                     <Trophy className="h-10 w-10 text-emerald-600" />
-                  </motion.div>
+                  </Pop>
 
                   {/* Title */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                  >
+                  <FadeUp delay={0.3}>
                     <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
                       Урок завершён!
                     </h2>
                     <p className="text-muted-foreground mt-1">
                       Все 6 основных блоков пройдены
                     </p>
-                  </motion.div>
+                  </FadeUp>
 
                   {/* Stats */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.45 }}
-                    className="flex justify-center gap-6"
-                  >
+                  <FadeUp delay={0.45} className="flex justify-center gap-6">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-emerald-600">{totalCorrect}</div>
                       <div className="text-xs text-muted-foreground mt-0.5">Правильных</div>
@@ -567,34 +526,25 @@ export default function Lesson29View() {
                       <div className="text-2xl font-bold text-rose-500">{totalIncorrect}</div>
                       <div className="text-xs text-muted-foreground mt-0.5">Ошибок</div>
                     </div>
-                  </motion.div>
+                  </FadeUp>
 
                   <Separator />
 
                   {/* Error Review */}
                   {totalIncorrect > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.55 }}
-                    >
+                    <FadeUp delay={0.55}>
                       <ErrorReviewSection
                         practiceAnswers={practiceAnswers}
                         errorNotes={errorNotes}
                         blocks={BLOCKS}
                       />
-                    </motion.div>
+                    </FadeUp>
                   )}
 
                   <Separator />
 
                   {/* Actions */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6 }}
-                    className="space-y-3 max-w-xs mx-auto"
-                  >
+                  <FadeUp delay={0.6} className="space-y-3 max-w-xs mx-auto">
                     <Button asChild className="w-full bg-emerald-600 hover:bg-emerald-700">
                       <Link href="/lessons">
                         <HomeIcon className="h-4 w-4 mr-2" />
@@ -609,15 +559,14 @@ export default function Lesson29View() {
                       <RotateCcw className="h-4 w-4 mr-2" />
                       Сбросить прогресс
                     </Button>
-                  </motion.div>
+                  </FadeUp>
                 </CardContent>
               </Card>
             ) : (
               /* ─── Block component — renders directly without wrapper header ── */
               currentBlock.component
             )}
-          </motion.div>
-        </AnimatePresence>
+        </FadeUp>
       </main>
 
       {/* ─── Bottom navigation bar ─────────────────────────────────────────── */}

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { Rotate, SlideIn, FadeUp } from '@/lib/motion'
 import {
   BookOpen,
   CheckCircle2,
@@ -106,12 +106,9 @@ function StyleCard({ style }: { style: (typeof BLOCK3_STYLES)[number] }) {
                 <div className="flex items-center gap-2">
                   <Badge className={`${colors.badge} text-xs`}>{style.name}</Badge>
                 </div>
-                <motion.div
-                  animate={{ rotate: open ? 180 : 0 }}
-                  transition={{ duration: 0.2 }}
-                >
+                <Rotate rotated={open}>
                   <ChevronDown className="size-5 text-muted-foreground" />
-                </motion.div>
+                </Rotate>
               </div>
               <CardDescription className="mt-2">{style.howToRecognize}</CardDescription>
             </CardHeader>
@@ -119,13 +116,7 @@ function StyleCard({ style }: { style: (typeof BLOCK3_STYLES)[number] }) {
         </CollapsibleTrigger>
         <CollapsibleContent>
           <CardContent className="pt-2 space-y-3">
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.25 }}
-              className="space-y-3"
-            >
+            <div className="space-y-3">
               {/* Features */}
               <div className="space-y-1">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -159,7 +150,7 @@ function StyleCard({ style }: { style: (typeof BLOCK3_STYLES)[number] }) {
                 </p>
                 <p className="text-sm text-amber-900 dark:text-amber-200">{style.traps}</p>
               </div>
-            </motion.div>
+            </div>
           </CardContent>
         </CollapsibleContent>
       </Card>
@@ -218,12 +209,14 @@ function Block3PracticeWalkthrough() {
       </CardHeader>
       <CardContent className="space-y-4">
         {walkthroughSteps.map((s, i) => (
-          <motion.div
+          <div
             key={i}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: step >= i ? 1 : 0.3, x: 0 }}
-            transition={{ duration: 0.3, delay: i * 0.1 }}
             className="space-y-1"
+            style={{
+              opacity: step >= i ? 1 : 0.3,
+              transform: 'translateX(0)',
+              transition: 'opacity 0.3s ease-out',
+            }}
           >
             <div className="flex items-center gap-2">
               <div
@@ -244,15 +237,17 @@ function Block3PracticeWalkthrough() {
               </span>
             </div>
             {s.content && step >= i && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
+              <p
+                style={{
+                  opacity: step >= i ? 1 : 0,
+                  transition: 'opacity 0.3s ease-out',
+                }}
                 className="text-sm text-muted-foreground ml-8"
               >
                 {s.content}
-              </motion.p>
+              </p>
             )}
-          </motion.div>
+          </div>
         ))}
 
         <div className="flex gap-2 pt-2">
@@ -283,12 +278,7 @@ function Block3PracticeWalkthrough() {
 
 function Tab1Propusk() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="space-y-4"
-    >
+    <FadeUp duration={0.3} className="space-y-4">
       {/* Algorithm explanation */}
       <Card>
         <CardHeader>
@@ -350,11 +340,8 @@ function Tab1Propusk() {
               </thead>
               <tbody>
                 {BLOCK1_MAP.map((item, i) => (
-                  <motion.tr
+                  <tr
                     key={i}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.2, delay: i * 0.05 }}
                     className="border-b last:border-b-0"
                   >
                     <td className="py-2.5 pr-4">
@@ -367,7 +354,7 @@ function Tab1Propusk() {
                         {item.word}
                       </span>
                     </td>
-                  </motion.tr>
+                  </tr>
                 ))}
               </tbody>
             </table>
@@ -376,7 +363,7 @@ function Tab1Propusk() {
       </Card>
 
 
-    </motion.div>
+    </FadeUp>
   )
 }
 
@@ -384,12 +371,7 @@ function Tab1Propusk() {
 
 function Tab2Znachenie() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="space-y-4"
-    >
+    <FadeUp duration={0.3} className="space-y-4">
       {/* Algorithm explanation */}
       <Card>
         <CardHeader>
@@ -408,13 +390,7 @@ function Tab2Znachenie() {
           {/* 4-step algorithm */}
           <div className="space-y-3">
             {block123Content.algorithm2.steps.map((s, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: (i + 1) * 0.1 }}
-                className="flex items-center gap-3"
-              >
+              <SlideIn key={i} direction={-1} delay={(i + 1) * 0.1} duration={0.3} className="flex items-center gap-3">
                 <div
                   className={`size-8 rounded-full flex items-center justify-center shrink-0 ${
                     i === 0 ? 'bg-rose-100 dark:bg-rose-900 text-rose-700 dark:text-rose-300' :
@@ -426,7 +402,7 @@ function Tab2Znachenie() {
                   <span className="text-sm font-bold">{i + 1}</span>
                 </div>
                 <span className="text-sm font-medium text-foreground">{s.text}</span>
-              </motion.div>
+              </SlideIn>
             ))}
           </div>
         </CardContent>
@@ -467,7 +443,7 @@ function Tab2Znachenie() {
       </Card>
 
 
-    </motion.div>
+    </FadeUp>
   )
 }
 
@@ -477,12 +453,7 @@ function Tab3Harakteristiki() {
   const { errorNotes, setErrorNote } = useLessonStore()
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="space-y-4"
-    >
+    <FadeUp duration={0.3} className="space-y-4">
       {/* Style intro */}
       <Alert className="border-purple-200 bg-purple-50 dark:bg-purple-950/40 dark:border-purple-800">
         <Shield className="size-4 text-purple-600 dark:text-purple-400" />
@@ -542,7 +513,7 @@ function Tab3Harakteristiki() {
           className="text-sm min-h-[60px]"
         />
       </div>
-    </motion.div>
+    </FadeUp>
   )
 }
 
@@ -640,12 +611,7 @@ function Practice123Section() {
   const t3Status = existingT3?.status
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="space-y-6"
-    >
+    <FadeUp duration={0.3} className="space-y-6">
       {/* Microtext */}
       <Card>
         <CardHeader>
@@ -698,15 +664,8 @@ function Practice123Section() {
             </Button>
           </div>
 
-          <AnimatePresence>
-            {task1Checked && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-3"
-              >
+          {task1Checked && (
+            <FadeUp duration={0.3} className="space-y-3">
                 <div className={`rounded-lg border-2 p-3 ${
                   t1Status === 'correct'
                     ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40'
@@ -752,9 +711,8 @@ function Practice123Section() {
                     />
                   </div>
                 )}
-              </motion.div>
-            )}
-          </AnimatePresence>
+            </FadeUp>
+          )}
         </CardContent>
       </Card>
 
@@ -818,15 +776,8 @@ function Practice123Section() {
                     </div>
                   </div>
 
-                  <AnimatePresence>
-                    {task2Checked && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="mt-2 ml-8"
-                      >
+                  {task2Checked && (
+                    <FadeUp duration={0.2} className="mt-2 ml-8">
                         <div className={`flex items-start gap-2 text-sm ${
                           isCorrect
                             ? 'text-emerald-700 dark:text-emerald-300'
@@ -841,9 +792,8 @@ function Practice123Section() {
                           ) : null}
                           <span>{option.explanation}</span>
                         </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                    </FadeUp>
+                  )}
                 </div>
               )
             })}
@@ -942,15 +892,8 @@ function Practice123Section() {
                     </div>
                   </div>
 
-                  <AnimatePresence>
-                    {task3Checked && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="mt-2 ml-8"
-                      >
+                  {task3Checked && (
+                    <FadeUp duration={0.2} className="mt-2 ml-8">
                         <div className={`flex items-start gap-2 text-sm ${
                           isCorrect
                             ? 'text-emerald-700 dark:text-emerald-300'
@@ -965,9 +908,8 @@ function Practice123Section() {
                           ) : null}
                           <span>{option.explanation}</span>
                         </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                    </FadeUp>
+                  )}
                 </div>
               )
             })}
@@ -996,7 +938,7 @@ function Practice123Section() {
           )}
         </CardContent>
       </Card>
-    </motion.div>
+    </FadeUp>
   )
 }
 
@@ -1061,55 +1003,29 @@ export default function Block123Microtext() {
         })}
       </div>
 
-      <AnimatePresence mode="wait">
-        {activeSection === 'tab1' && (
-          <motion.div
-            key="tab1"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-          >
+      {activeSection === 'tab1' && (
+        <FadeUp key="tab1" duration={0.3}>
             <Tab1Propusk />
-          </motion.div>
-        )}
+        </FadeUp>
+      )}
 
         {activeSection === 'tab2' && (
-          <motion.div
-            key="tab2"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-          >
+          <FadeUp key="tab2" duration={0.3}>
             <Tab2Znachenie />
-          </motion.div>
+          </FadeUp>
         )}
 
         {activeSection === 'tab3' && (
-          <motion.div
-            key="tab3"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-          >
+          <FadeUp key="tab3" duration={0.3}>
             <Tab3Harakteristiki />
-          </motion.div>
+          </FadeUp>
         )}
 
         {activeSection === 'practice' && (
-          <motion.div
-            key="practice"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-          >
+          <FadeUp key="practice" duration={0.3}>
             <Practice123Section />
-          </motion.div>
+          </FadeUp>
         )}
-      </AnimatePresence>
 
       <Separator />
 

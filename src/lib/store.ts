@@ -158,6 +158,26 @@ export const useLessonStore = create<LessonState>()(
     }),
     {
       name: 'ege-lesson-storage',
+      // Exclude volatile navigation state from persistence
+      partialize: (state) => ({
+        lessonStarted: state.lessonStarted,
+        completedBlocks: state.completedBlocks,
+        practiceAnswers: state.practiceAnswers,
+        blockProgress: state.blockProgress,
+        errorNotes: state.errorNotes,
+        homeworkChecks: state.homeworkChecks,
+        visitedSections: state.visitedSections,
+      }),
+      merge: (persisted, current) => {
+        if (!persisted || typeof persisted !== 'object') return current
+        const p = persisted as Partial<LessonState>
+        return {
+          ...current,
+          ...p,
+          // Don't persist currentBlock (volatile navigation state)
+          currentBlock: null,
+        }
+      },
     }
   )
 )

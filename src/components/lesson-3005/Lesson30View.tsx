@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { FadeUp, Pop, SlideIn } from '@/lib/motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
@@ -25,6 +25,7 @@ import {
   PenTool,
   MessageSquare,
   FileText,
+  Clock,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -40,21 +41,16 @@ import Block14Spelling from '@/components/lesson-3005/Block14Spelling'
 import Block2325MacrotextControl from '@/components/lesson-3005/Block2325MacrotextControl'
 import Lesson3005Homework from '@/components/lesson-3005/Lesson3005Homework'
 
-// ─── Block definitions ────────────────────────────────────────────────────────
-type Lesson30Block = {
+// ─── Block definitions with time estimates ────────────────────────────────────
+const BLOCKS: {
   id: BlockId30
   label: string
   shortLabel: string
   icon: React.ReactNode
   color: string
   component: React.ReactNode
-}
-
-type Lesson30Step = Omit<Lesson30Block, 'id'> & {
-  id: BlockId30 | 'completion'
-}
-
-const BLOCKS: Lesson30Block[] = [
+  timeEstimate: string
+}[] = [
   {
     id: 'block12',
     label: '№12. Глаголы и причастия',
@@ -62,6 +58,7 @@ const BLOCKS: Lesson30Block[] = [
     icon: <PenTool className="h-4 w-4" />,
     color: 'emerald',
     component: <Block12VerbsParticiples />,
+    timeEstimate: '~20 мин',
   },
   {
     id: 'block11',
@@ -70,6 +67,7 @@ const BLOCKS: Lesson30Block[] = [
     icon: <MessageSquare className="h-4 w-4" />,
     color: 'teal',
     component: <Block11Suffixes />,
+    timeEstimate: '~15 мин',
   },
   {
     id: 'block14',
@@ -78,6 +76,7 @@ const BLOCKS: Lesson30Block[] = [
     icon: <BookOpen className="h-4 w-4" />,
     color: 'orange',
     component: <Block14Spelling />,
+    timeEstimate: '~20 мин',
   },
   {
     id: 'block2325',
@@ -86,6 +85,7 @@ const BLOCKS: Lesson30Block[] = [
     icon: <FileText className="h-4 w-4" />,
     color: 'sky',
     component: <Block2325MacrotextControl />,
+    timeEstimate: '~10 мин',
   },
   {
     id: 'homework',
@@ -94,6 +94,7 @@ const BLOCKS: Lesson30Block[] = [
     icon: <ClipboardList className="h-4 w-4" />,
     color: 'amber',
     component: <Lesson3005Homework />,
+    timeEstimate: '~15 мин',
   },
 ]
 
@@ -106,15 +107,7 @@ const colorClasses: Record<string, { bg: string; text: string; badge: string }> 
 }
 
 // ─── Main block IDs used for completion check ────────────────────────────────
-const MAIN_BLOCK_IDS: BlockId30[] = ['block12', 'block11', 'block14', 'block2325', 'homework']
-
-const BLOCK_TIMES: Record<BlockId30, string> = {
-  block12: '5–45',
-  block11: '45–75',
-  block14: '75–105',
-  block2325: '105–115',
-  homework: '115–120',
-}
+const MAIN_BLOCK_IDS: BlockId30[] = ['block12', 'block11', 'block14', 'block2325']
 
 // ─── Error Review Component ─────────────────────────────────────────────────
 
@@ -221,26 +214,29 @@ export default function Lesson30View() {
   const [activeStep, setActiveStep] = useState(0)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  // Overall progress calculation
-  const totalBlocks = MAIN_BLOCK_IDS.length
-  const completedMainBlocks = MAIN_BLOCK_IDS.filter((id) => completedBlocks.includes(id)).length
-  const overallProgress = Math.round((completedMainBlocks / totalBlocks) * 100)
-  const allMainBlocksCompleted = completedMainBlocks === totalBlocks
+  // Overall progress: X / 5 блоков (all 5 including homework)
+  const totalBlocks = BLOCKS.length // 5
+  const completedBlockCount = BLOCKS.filter((b) => completedBlocks.includes(b.id)).length
+  const overallProgress = Math.round((completedBlockCount / totalBlocks) * 100)
+
+  const mainBlocksCompleted = MAIN_BLOCK_IDS.filter((id) => completedBlocks.includes(id)).length
+  const allMainBlocksCompleted = mainBlocksCompleted === MAIN_BLOCK_IDS.length
 
   const totalCorrect = Object.values(blockProgress).reduce((s, b) => s + b.correctCount, 0)
   const totalIncorrect = Object.values(blockProgress).reduce((s, b) => s + b.incorrectCount, 0)
 
   // Effective blocks: add completion step when all main blocks are done
-  const COMPLETION_STEP: Lesson30Step = {
-    id: 'completion',
+  const COMPLETION_STEP = {
+    id: 'completion' as BlockId30,
     label: 'Урок завершён',
     shortLabel: 'Завершён',
     icon: <Trophy className="h-4 w-4" />,
     color: 'emerald',
     component: null as React.ReactNode,
+    timeEstimate: '',
   }
 
-  const effectiveBlocks: Lesson30Step[] = allMainBlocksCompleted ? [...BLOCKS, COMPLETION_STEP] : BLOCKS
+  const effectiveBlocks = allMainBlocksCompleted ? [...BLOCKS, COMPLETION_STEP] : BLOCKS
   const totalSteps = effectiveBlocks.length
   const currentBlock = effectiveBlocks[activeStep]
   const isCompletionStep = allMainBlocksCompleted && activeStep === BLOCKS.length
@@ -270,27 +266,20 @@ export default function Lesson30View() {
     return (
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100">
         <main className="flex-1 flex items-center justify-center p-4 sm:p-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="max-w-2xl w-full"
-          >
+          <FadeUp duration={0.6} className="max-w-2xl w-full">
             <Card className="border-0 shadow-xl">
               <CardHeader className="text-center pb-4">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                  className="mx-auto mb-4 w-16 h-16 rounded-2xl bg-emerald-100 flex items-center justify-center"
-                >
+                <Pop delay={0.2} className="mx-auto mb-4 w-16 h-16 rounded-2xl bg-emerald-100 flex items-center justify-center">
                   <GraduationCap className="h-8 w-8 text-emerald-600" />
-                </motion.div>
+                </Pop>
                 <CardTitle className="text-2xl sm:text-3xl font-bold tracking-tight">
                   Сегодня закрываем грязную орфографию
                 </CardTitle>
-                <p className="text-muted-foreground mt-2 text-base">
-                  ЕГЭ русский — урок 30.05.2026 · Орфография без угадайки
+                <p className="text-muted-foreground mt-1 text-lg">
+                  Орфография без угадайки
+                </p>
+                <p className="text-muted-foreground text-sm">
+                  {LESSON_30_META.date}
                 </p>
               </CardHeader>
 
@@ -302,21 +291,47 @@ export default function Lesson30View() {
                     <div>
                       <h3 className="font-semibold text-emerald-900 mb-1">Цель урока</h3>
                       <p className="text-emerald-800 text-sm leading-relaxed">
-                        Перестать выбирать букву по ощущению и решать через цепочку: форма слова → часть речи → правило → ответ.
+                        {LESSON_30_META.goal}
                       </p>
                     </div>
                   </div>
                 </div>
 
+                {/* What we cover */}
                 <div>
                   <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                    Сегодня не учим всё подряд
+                    Сегодня проходим
                   </h3>
-                  <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
-                    <p>Закрываем три задания, где чаще всего начинается угадайка: №12, №11 и №14.</p>
-                    <p>В конце — короткая добивка №23–25 без новой теории и без раздувания урока.</p>
+                  <div className="space-y-2">
+                    {LESSON_30_META.todayWeCover.map((item, i) => (
+                      <SlideIn
+                        key={i}
+                        direction={-1}
+                        delay={0.3 + i * 0.08}
+                        className="flex items-start gap-2 text-sm"
+                      >
+                        <ChevronRight className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
+                        <span>{item}</span>
+                      </SlideIn>
+                    ))}
                   </div>
+                </div>
+
+                {/* What we don't cover */}
+                <div>
+                  <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                    <XCircle className="h-4 w-4 text-rose-500" />
+                    Сегодня НЕ трогаем
+                  </h3>
+                  <ul className="space-y-2">
+                    {LESSON_30_META.todayWeDont.map((item, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                        <span className="text-rose-400 mt-0.5">—</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
                 <Separator />
@@ -328,26 +343,27 @@ export default function Lesson30View() {
                   </p>
                 </div>
 
-                {/* Block list preview */}
+                {/* Block list preview with time estimates */}
                 <div>
                   <h3 className="font-semibold text-foreground mb-3 text-sm">
                     Блоки урока
                   </h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {BLOCKS.map((block) => {
+                  <div className="space-y-2">
+                    {BLOCKS.map((block, i) => {
                       const c = colorClasses[block.color]
                       return (
                         <div
                           key={block.id}
-                          className="flex items-center gap-2 rounded-lg border p-2 text-sm"
+                          className="flex items-center gap-2 rounded-lg border p-2.5 text-sm"
                         >
                           <div className={`w-7 h-7 rounded-md ${c.bg} ${c.text} flex items-center justify-center shrink-0`}>
                             {block.icon}
                           </div>
-                          <div className="min-w-0">
-                            <span className="block truncate text-xs font-medium">{block.shortLabel}</span>
-                            <span className="block text-[11px] text-muted-foreground">{BLOCK_TIMES[block.id]} мин</span>
-                          </div>
+                          <span className="text-xs font-medium flex-1 truncate">{block.shortLabel}</span>
+                          <span className="text-xs text-muted-foreground flex items-center gap-1 shrink-0">
+                            <Clock className="h-3 w-3" />
+                            {block.timeEstimate}
+                          </span>
                         </div>
                       )
                     })}
@@ -355,11 +371,7 @@ export default function Lesson30View() {
                 </div>
 
                 {/* Start button */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.8 }}
-                >
+                <FadeUp delay={0.8}>
                   <Button
                     onClick={startLesson}
                     size="lg"
@@ -368,10 +380,10 @@ export default function Lesson30View() {
                     Начать с №12
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
-                </motion.div>
+                </FadeUp>
               </CardContent>
             </Card>
-          </motion.div>
+          </FadeUp>
         </main>
 
         <footer className="py-4 text-center text-xs text-muted-foreground border-t bg-white">
@@ -383,8 +395,8 @@ export default function Lesson30View() {
 
   // ─── Main lesson view — one block at a time ──────────────────────────────
   const c = colorClasses[currentBlock.color]
-  const isCompleted = currentBlock.id !== 'completion' && completedBlocks.includes(currentBlock.id)
-  const hasErrors = currentBlock.id !== 'completion' && blockProgress[currentBlock.id]?.incorrectCount > 0
+  const isCompleted = !isCompletionStep && completedBlocks.includes(currentBlock.id)
+  const hasErrors = !isCompletionStep && blockProgress[currentBlock.id]?.incorrectCount > 0
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
@@ -412,24 +424,16 @@ export default function Lesson30View() {
                 <div className={`w-7 h-7 rounded-md ${c.bg} ${c.text} flex items-center justify-center shrink-0`}>
                   {currentBlock.icon}
                 </div>
-                <div className="min-w-0">
-                  <span className="block truncate text-xs text-muted-foreground">
-                    ЕГЭ русский — урок 30.05.2026
-                  </span>
-                  <span className="block truncate text-sm font-semibold">Орфография без угадайки</span>
-                </div>
+                <span className="text-sm font-semibold truncate">{currentBlock.shortLabel}</span>
                 {isCompleted && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />}
                 {hasErrors && <AlertCircle className="h-3.5 w-3.5 text-rose-500 shrink-0" />}
               </div>
             </div>
 
             {/* Right: step counter */}
-            <div className="flex flex-col items-end gap-0.5 shrink-0">
+            <div className="flex items-center gap-2 shrink-0">
               <span className="text-xs text-muted-foreground">
-                Пройдено: {completedMainBlocks}/{totalBlocks}
-              </span>
-              <span className="hidden text-xs text-muted-foreground sm:inline">
-                Текущий блок: {Math.min(activeStep + 1, totalBlocks)}/{totalBlocks}
+                {completedBlockCount}/{totalBlocks} блоков
               </span>
             </div>
           </div>
@@ -448,7 +452,7 @@ export default function Lesson30View() {
               <div className="mb-3 px-1">
                 <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
                   <span>Общий прогресс</span>
-                  <span>{completedMainBlocks}/{totalBlocks} блоков</span>
+                  <span>{completedBlockCount}/{totalBlocks} блоков</span>
                 </div>
                 <Progress value={overallProgress} className="h-1.5" />
                 <div className="flex gap-3 mt-1.5 text-xs text-muted-foreground">
@@ -484,6 +488,12 @@ export default function Lesson30View() {
                       {block.icon}
                     </div>
                     <span className="flex-1 text-left">{block.label}</span>
+                    {block.timeEstimate && (
+                      <span className="text-xs text-muted-foreground flex items-center gap-1 shrink-0">
+                        <Clock className="h-3 w-3" />
+                        {block.timeEstimate}
+                      </span>
+                    )}
                     {blockCompleted && <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />}
                     {blockErrors && <AlertCircle className="h-4 w-4 text-rose-500 shrink-0" />}
                   </button>
@@ -496,51 +506,30 @@ export default function Lesson30View() {
 
       {/* ─── Content area ──────────────────────────────────────────────────── */}
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-6">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentBlock.id}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.25 }}
-          >
+        <FadeUp key={currentBlock.id} duration={0.25}>
             {isCompletionStep ? (
               /* ─── Lesson Completion Screen ────────────────────────────── */
               <Card className="border-0 shadow-lg">
                 <CardContent className="py-10 px-6 text-center space-y-6">
                   {/* Celebration icon */}
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.15, type: 'spring', stiffness: 200 }}
-                    className="mx-auto w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center"
-                  >
+                  <Pop delay={0.15} className="mx-auto w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center">
                     <Trophy className="h-10 w-10 text-emerald-600" />
-                  </motion.div>
+                  </Pop>
 
                   {/* Title */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                  >
+                  <FadeUp delay={0.3}>
                     <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
                       Урок завершён!
                     </h2>
                     <p className="text-muted-foreground mt-1">
-                      Все 5 блоков пройдены
+                      Все {MAIN_BLOCK_IDS.length} основных блока пройдены
                     </p>
-                  </motion.div>
+                  </FadeUp>
 
                   {/* Stats */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.45 }}
-                    className="flex justify-center gap-6"
-                  >
+                  <FadeUp delay={0.45} className="flex justify-center gap-6">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-emerald-600">{completedMainBlocks}</div>
+                      <div className="text-2xl font-bold text-emerald-600">{mainBlocksCompleted}</div>
                       <div className="text-xs text-muted-foreground mt-0.5">Блоков пройдено</div>
                     </div>
                     <div className="text-center">
@@ -551,34 +540,25 @@ export default function Lesson30View() {
                       <div className="text-2xl font-bold text-rose-500">{totalIncorrect}</div>
                       <div className="text-xs text-muted-foreground mt-0.5">Ошибок</div>
                     </div>
-                  </motion.div>
+                  </FadeUp>
 
                   <Separator />
 
                   {/* Error Review */}
                   {totalIncorrect > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.55 }}
-                    >
+                    <FadeUp delay={0.55}>
                       <ErrorReviewSection
                         practiceAnswers={practiceAnswers}
                         errorNotes={errorNotes}
                         blocks={BLOCKS}
                       />
-                    </motion.div>
+                    </FadeUp>
                   )}
 
                   <Separator />
 
                   {/* Actions */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6 }}
-                    className="space-y-3 max-w-xs mx-auto"
-                  >
+                  <FadeUp delay={0.6} className="space-y-3 max-w-xs mx-auto">
                     <Button asChild className="w-full bg-emerald-600 hover:bg-emerald-700">
                       <Link href="/">
                         <HomeIcon className="h-4 w-4 mr-2" />
@@ -599,15 +579,14 @@ export default function Lesson30View() {
                       <RotateCcw className="h-4 w-4 mr-2" />
                       Сбросить прогресс
                     </Button>
-                  </motion.div>
+                  </FadeUp>
                 </CardContent>
               </Card>
             ) : (
               /* ─── Block component ── */
               currentBlock.component
             )}
-          </motion.div>
-        </AnimatePresence>
+        </FadeUp>
       </main>
 
       {/* ─── Bottom navigation bar ─────────────────────────────────────────── */}

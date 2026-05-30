@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { FadeUp, SlideIn, AnimatedWidth } from '@/lib/motion'
 import {
   BookOpen,
   CheckCircle2,
@@ -100,18 +100,12 @@ function AlgorithmSection() {
       <CardContent>
         <div className="space-y-2">
           {block5Content.algorithms?.[0]?.steps.map((stepText, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.1, duration: 0.3 }}
-              className="flex items-center gap-3 rounded-lg border bg-accent/30 p-3"
-            >
+            <SlideIn key={i} direction={-1} delay={i * 0.1} duration={0.3} className="flex items-center gap-3 rounded-lg border bg-accent/30 p-3">
               <span className="flex items-center justify-center size-7 rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0">
                 {i + 1}
               </span>
               <span className="text-sm font-medium">{stepText}</span>
-            </motion.div>
+            </SlideIn>
           ))}
         </div>
       </CardContent>
@@ -281,15 +275,8 @@ function PracticeQuestion({
         )}
 
         {/* Results */}
-        <AnimatePresence>
-          {checked && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-3"
-            >
+        {checked && (
+          <FadeUp duration={0.3} className="space-y-3">
               {/* Status message */}
               {existingAnswer?.status === 'correct' ? (
                 <div className="flex items-center gap-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 p-3">
@@ -359,9 +346,8 @@ function PracticeQuestion({
               <Button variant="outline" size="sm" onClick={handleRetry}>
                 Попробовать снова
               </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          </FadeUp>
+        )}
       </CardContent>
     </Card>
   )
@@ -428,16 +414,8 @@ export default function Block5Paronimy() {
       </div>
 
       {/* Theory Section */}
-      <AnimatePresence mode="wait">
-        {activeSection === 'theory' && (
-          <motion.div
-            key="theory"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-4"
-          >
+      {activeSection === 'theory' && (
+        <FadeUp key="theory" duration={0.3} className="space-y-4">
             <Alert className="border-amber-300 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-800">
               <AlertTriangle className="size-4 text-amber-600 dark:text-amber-400" />
               <AlertTitle className="text-amber-800 dark:text-amber-300">
@@ -512,32 +490,19 @@ export default function Block5Paronimy() {
                 ))}
               </Accordion>
             </div>
-          </motion.div>
-        )}
+        </FadeUp>
+      )}
 
         {/* Algorithm Section */}
         {activeSection === 'algorithm' && (
-          <motion.div
-            key="algorithm"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-          >
+          <FadeUp key="algorithm" duration={0.3}>
             <AlgorithmSection />
-          </motion.div>
+          </FadeUp>
         )}
 
         {/* Practice Section */}
         {activeSection === 'practice' && (
-          <motion.div
-            key="practice"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-4"
-          >
+          <FadeUp key="practice" duration={0.3} className="space-y-4">
             <Alert className="border-amber-300 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-800">
               <AlertTriangle className="size-4 text-amber-600 dark:text-amber-400" />
               <AlertTitle className="text-amber-800 dark:text-amber-300">
@@ -575,13 +540,10 @@ export default function Block5Paronimy() {
                 </span>
               </div>
               <div className="h-2 rounded-full bg-muted overflow-hidden">
-                <motion.div
+                <AnimatedWidth
                   className="h-full rounded-full bg-emerald-500"
-                  initial={{ width: 0 }}
-                  animate={{
-                    width: `${(answeredCount / BLOCK5_PRACTICE.length) * 100}%`,
-                  }}
-                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                  percentage={(answeredCount / BLOCK5_PRACTICE.length) * 100}
+                  duration={0.5}
                 />
               </div>
               <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
@@ -595,9 +557,8 @@ export default function Block5Paronimy() {
                 </span>
               </div>
             </div>
-          </motion.div>
+        </FadeUp>
         )}
-      </AnimatePresence>
 
       <Separator />
 

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { FadeUp, SlideIn } from '@/lib/motion'
 import {
   BookOpen,
   CheckCircle2,
@@ -274,18 +274,12 @@ function Algorithm26Section() {
       <CardContent>
         <ol className="space-y-3">
           {steps.map((stepText, i) => (
-            <motion.li
-              key={i}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className="flex gap-3 text-sm"
-            >
+            <SlideIn key={i} direction={-1} delay={i * 0.1} duration={0.25} className="flex gap-3 text-sm">
               <span className="flex-shrink-0 w-7 h-7 rounded-full bg-amber-200 dark:bg-amber-800 text-amber-700 dark:text-amber-300 flex items-center justify-center text-xs font-bold">
                 {i + 1}
               </span>
               <span className="pt-1 text-foreground">{stepText}</span>
-            </motion.li>
+            </SlideIn>
           ))}
         </ol>
       </CardContent>
@@ -374,32 +368,17 @@ function PracticePairCard({ pair, index }: { pair: PracticePair; index: number }
         </div>
 
         {/* Reveal button / answer */}
-        <AnimatePresence mode="wait">
-          {!revealed ? (
-            <motion.div
-              key="button"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+        {!revealed ? (
+            <Button
+              variant="outline"
+              onClick={() => setRevealed(true)}
+              className="w-full border-dashed border-amber-400 dark:border-amber-600 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-950/30"
             >
-              <Button
-                variant="outline"
-                onClick={() => setRevealed(true)}
-                className="w-full border-dashed border-amber-400 dark:border-amber-600 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-950/30"
-              >
-                <Lightbulb className="size-4 mr-2" />
-                Показать ответ
-              </Button>
-            </motion.div>
+              <Lightbulb className="size-4 mr-2" />
+              Показать ответ
+            </Button>
           ) : (
-            <motion.div
-              key="answer"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.25 }}
-              className="space-y-2"
-            >
+            <FadeUp duration={0.25} className="space-y-2">
               {/* Mean type */}
               <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 p-3">
                 <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 mb-1">
@@ -436,9 +415,8 @@ function PracticePairCard({ pair, index }: { pair: PracticePair; index: number }
                 <p className="text-xs font-semibold text-muted-foreground mb-1">Объяснение:</p>
                 <p className="text-sm text-foreground">{pair.explanation}</p>
               </div>
-            </motion.div>
+            </FadeUp>
           )}
-        </AnimatePresence>
       </CardContent>
     </Card>
   )
@@ -525,13 +503,7 @@ function PracticeTemplate() {
         {/* Entries */}
         <div className="space-y-4">
           {entries.map((entry, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2 }}
-              className="rounded-xl border-2 border-dashed border-orange-300 dark:border-orange-700 p-4 space-y-3"
-            >
+            <FadeUp key={index} duration={0.2} className="rounded-xl border-2 border-dashed border-orange-300 dark:border-orange-700 p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <Badge className="bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300 border-orange-300">
                   Разбор {index + 1}
@@ -621,7 +593,7 @@ function PracticeTemplate() {
                   className="text-sm"
                 />
               </div>
-            </motion.div>
+            </FadeUp>
           ))}
         </div>
 
@@ -710,17 +682,8 @@ export default function Block26SredstvaSvyazi() {
         })}
       </div>
 
-      <AnimatePresence mode="wait">
-        {/* Theory: Means of Connection Cards */}
-        {activeSection === 'theory' && (
-          <motion.div
-            key="theory"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-4"
-          >
+      {activeSection === 'theory' && (
+        <FadeUp key="theory" duration={0.3} className="space-y-4">
             {/* Main Warning — at top of theory tab */}
             <MainWarning />
 
@@ -776,33 +739,19 @@ export default function Block26SredstvaSvyazi() {
                 ))}
               </div>
             </div>
-          </motion.div>
-        )}
+        </FadeUp>
+      )}
 
-        {/* Key Differences */}
-        {activeSection === 'differences' && (
-          <motion.div
-            key="differences"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-4"
-          >
+      {/* Key Differences */}
+      {activeSection === 'differences' && (
+        <FadeUp key="differences" duration={0.3} className="space-y-4">
             <KeyDifferencesSection />
-          </motion.div>
-        )}
+        </FadeUp>
+      )}
 
-        {/* Algorithm */}
-        {activeSection === 'algorithm' && (
-          <motion.div
-            key="algorithm"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-4"
-          >
+      {/* Algorithm */}
+      {activeSection === 'algorithm' && (
+        <FadeUp key="algorithm" duration={0.3} className="space-y-4">
             <Algorithm26Section />
 
             {/* Reminder of the main warning */}
@@ -815,19 +764,12 @@ export default function Block26SredstvaSvyazi() {
                 {block26Content.algorithmReminder}
               </AlertDescription>
             </Alert>
-          </motion.div>
-        )}
+        </FadeUp>
+      )}
 
-        {/* Practice Template */}
-        {activeSection === 'practice' && (
-          <motion.div
-            key="practice"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-4"
-          >
+      {/* Practice Template */}
+      {activeSection === 'practice' && (
+        <FadeUp key="practice" duration={0.3} className="space-y-4">
             {/* Training Pairs */}
             <Card className="border-amber-200 dark:border-amber-800">
               <CardHeader>
@@ -858,9 +800,8 @@ export default function Block26SredstvaSvyazi() {
 
             {/* Self-study template */}
             <PracticeTemplate />
-          </motion.div>
-        )}
-      </AnimatePresence>
+        </FadeUp>
+      )}
 
       <Separator />
 

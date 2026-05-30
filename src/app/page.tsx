@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { FadeUp } from '@/lib/motion'
 import {
   ChevronRight,
   BookOpen,
@@ -37,12 +37,7 @@ export default function DashboardPage() {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100">
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-8">
         {/* ─── Welcome banner ──────────────────────────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8"
-        >
+        <FadeUp duration={0.5} className="mb-8">
           <Card className="border-0 shadow-lg overflow-hidden bg-gradient-to-r from-emerald-600 to-teal-600 text-white">
             <CardContent className="p-6 sm:p-8">
               <div className="flex items-start gap-4">
@@ -72,27 +67,17 @@ export default function DashboardPage() {
               )}
             </CardContent>
           </Card>
-        </motion.div>
+        </FadeUp>
 
         {/* ─── Upcoming lessons ────────────────────────────────────────── */}
         {upcomingLessons.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.4 }}
-            className="mb-8"
-          >
+          <FadeUp delay={0.1} duration={0.4} className="mb-8">
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
               Предстоящие уроки
             </h2>
             <div className="space-y-3">
               {upcomingLessons.map((lesson, i) => (
-                <motion.div
-                  key={lesson.slug}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15 + i * 0.07, duration: 0.35 }}
-                >
+                <FadeUp key={lesson.slug} delay={0.15 + i * 0.07} duration={0.35}>
                   <a href={`/lessons/${lesson.slug}`}>
                     <Card className="transition-all hover:shadow-md hover:border-emerald-300 cursor-pointer group">
                       <CardContent className="p-4 sm:p-5">
@@ -138,19 +123,14 @@ export default function DashboardPage() {
                       </CardContent>
                     </Card>
                   </a>
-                </motion.div>
+                </FadeUp>
               ))}
             </div>
-          </motion.div>
+          </FadeUp>
         )}
 
         {/* ─── Quick actions: Повторение + Тест ────────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25, duration: 0.4 }}
-          className="mb-8"
-        >
+        <FadeUp delay={0.25} duration={0.4} className="mb-8">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
             Навигация
           </h2>
@@ -195,16 +175,11 @@ export default function DashboardPage() {
               </span>
             </div>
           </div>
-        </motion.div>
+        </FadeUp>
 
         {/* ─── Stats ───────────────────────────────────────────────────── */}
         {hasProgress && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35, duration: 0.4 }}
-            className="mb-8"
-          >
+          <FadeUp delay={0.35} duration={0.4} className="mb-8">
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
               Твоя статистика
             </h2>
@@ -238,15 +213,11 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             </div>
-          </motion.div>
+          </FadeUp>
         )}
 
         {/* ─── Motivation tip ──────────────────────────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.45, duration: 0.4 }}
-        >
+        <FadeUp delay={0.45} duration={0.4}>
           <Card className="border-0 shadow-sm bg-amber-50 border border-amber-200">
             <CardContent className="p-4 flex items-start gap-3">
               <Sparkles className="h-5 w-5 text-amber-500 mt-0.5 shrink-0" />
@@ -260,7 +231,7 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </FadeUp>
       </main>
 
       <footer className="mt-auto py-4 text-center text-xs text-muted-foreground border-t bg-white">

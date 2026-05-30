@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { FadeUp, Rotate, AnimatedWidth } from '@/lib/motion'
 import {
   BookOpen,
   CheckCircle2,
@@ -41,12 +41,9 @@ function OrientirCard({
                 <CardTitle className="text-base font-semibold text-foreground">
                   {orientir.title}
                 </CardTitle>
-                <motion.div
-                  animate={{ rotate: open ? 180 : 0 }}
-                  transition={{ duration: 0.2 }}
-                >
+                <Rotate rotated={open}>
                   <ChevronDown className="size-5 text-muted-foreground" />
-                </motion.div>
+                </Rotate>
               </div>
               <CardDescription className="mt-1">{orientir.rule}</CardDescription>
             </CardHeader>
@@ -54,13 +51,7 @@ function OrientirCard({
         </CollapsibleTrigger>
         <CollapsibleContent>
           <CardContent className="pt-2 space-y-3">
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.25 }}
-              className="space-y-3"
-            >
+            <div className="space-y-3">
               <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 p-3">
                 <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400 mb-1">
                   Правильно
@@ -82,7 +73,7 @@ function OrientirCard({
                   {orientir.explanation}
                 </p>
               </div>
-            </motion.div>
+            </div>
           </CardContent>
         </CollapsibleContent>
       </Card>
@@ -215,15 +206,8 @@ function PracticeQuestion({
         )}
 
         {/* Result */}
-        <AnimatePresence>
-          {checked && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-3"
-            >
+        {checked && (
+          <FadeUp duration={0.3} className="space-y-3">
               {existingAnswer?.status === 'correct' ? (
                 <div className="flex items-center gap-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 p-3">
                   <CheckCircle2 className="size-5 text-emerald-500 shrink-0" />
@@ -278,9 +262,8 @@ function PracticeQuestion({
               <Button variant="outline" size="sm" onClick={handleRetry}>
                 Попробовать снова
               </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          </FadeUp>
+        )}
       </CardContent>
     </Card>
   )
@@ -346,16 +329,8 @@ export default function Block4Udareniya() {
       </div>
 
       {/* Theory Section */}
-      <AnimatePresence mode="wait">
-        {activeSection === 'theory' && (
-          <motion.div
-            key="theory"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-4"
-          >
+      {activeSection === 'theory' && (
+        <FadeUp key="theory" duration={0.3} className="space-y-4">
             <Alert className="border-amber-300 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-800">
               <AlertTriangle className="size-4 text-amber-600 dark:text-amber-400" />
               <AlertTitle className="text-amber-800 dark:text-amber-300">
@@ -371,19 +346,12 @@ export default function Block4Udareniya() {
                 <OrientirCard key={orientir.id} orientir={orientir} />
               ))}
             </div>
-          </motion.div>
-        )}
+        </FadeUp>
+      )}
 
-        {/* Practice Section */}
-        {activeSection === 'practice' && (
-          <motion.div
-            key="practice"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-4"
-          >
+      {/* Practice Section */}
+      {activeSection === 'practice' && (
+        <FadeUp key="practice" duration={0.3} className="space-y-4">
             <Alert className="border-amber-300 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-800">
               <Sparkles className="size-4 text-amber-600 dark:text-amber-400" />
               <AlertDescription className="text-amber-700 dark:text-amber-400 text-sm">
@@ -413,13 +381,10 @@ export default function Block4Udareniya() {
                 </span>
               </div>
               <div className="h-2 rounded-full bg-muted overflow-hidden">
-                <motion.div
+                <AnimatedWidth
                   className="h-full rounded-full bg-emerald-500"
-                  initial={{ width: 0 }}
-                  animate={{
-                    width: `${(answeredCount / BLOCK4_PRACTICE.length) * 100}%`,
-                  }}
-                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                  percentage={(answeredCount / BLOCK4_PRACTICE.length) * 100}
+                  duration={0.5}
                 />
               </div>
               <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
@@ -433,11 +398,8 @@ export default function Block4Udareniya() {
                 </span>
               </div>
             </div>
-          </motion.div>
-        )}
-
-
-      </AnimatePresence>
+        </FadeUp>
+      )}
 
       <Separator />
 

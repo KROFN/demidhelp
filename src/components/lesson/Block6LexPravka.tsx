@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { FadeUp, AnimatedWidth } from '@/lib/motion'
 import {
   BookOpen,
   CheckCircle2,
@@ -266,15 +266,8 @@ function PracticeQuestion({
         )}
 
         {/* Result */}
-        <AnimatePresence>
-          {state.checked && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-3"
-            >
+        {state.checked && (
+          <FadeUp duration={0.3} className="space-y-3">
               {answerCorrect ? (
                 <div className="flex items-center gap-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 p-3">
                   <CheckCircle2 className="size-5 text-emerald-500 shrink-0" />
@@ -328,9 +321,8 @@ function PracticeQuestion({
               <Button variant="outline" size="sm" onClick={handleRetry}>
                 Попробовать снова
               </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          </FadeUp>
+        )}
       </CardContent>
     </Card>
   )
@@ -395,17 +387,8 @@ export default function Block6LexPravka() {
         })}
       </div>
 
-      <AnimatePresence mode="wait">
-        {/* Theory Section */}
-        {activeSection === 'theory' && (
-          <motion.div
-            key="theory"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-4"
-          >
+      {activeSection === 'theory' && (
+        <FadeUp key="theory" duration={0.3} className="space-y-4">
             {/* Type 1: Pleonasm */}
             <Card>
               <CardHeader>
@@ -476,19 +459,12 @@ export default function Block6LexPravka() {
                 {block6Content.searchAlgorithm}
               </AlertDescription>
             </Alert>
-          </motion.div>
-        )}
+        </FadeUp>
+      )}
 
-        {/* Practice Section */}
-        {activeSection === 'practice' && (
-          <motion.div
-            key="practice"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-4"
-          >
+      {/* Practice Section */}
+      {activeSection === 'practice' && (
+        <FadeUp key="practice" duration={0.3} className="space-y-4">
             {/* Visual Hint always visible during training */}
             <Alert className="border-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-800">
               <Lightbulb className="size-4 text-emerald-600 dark:text-emerald-400" />
@@ -526,13 +502,10 @@ export default function Block6LexPravka() {
                 </span>
               </div>
               <div className="h-2 rounded-full bg-muted overflow-hidden">
-                <motion.div
+                <AnimatedWidth
                   className="h-full rounded-full bg-emerald-500"
-                  initial={{ width: 0 }}
-                  animate={{
-                    width: `${(answeredCount / BLOCK6_PRACTICE.length) * 100}%`,
-                  }}
-                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                  percentage={(answeredCount / BLOCK6_PRACTICE.length) * 100}
+                  duration={0.5}
                 />
               </div>
               <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
@@ -546,9 +519,8 @@ export default function Block6LexPravka() {
                 </span>
               </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        </FadeUp>
+      )}
 
       <Separator />
 

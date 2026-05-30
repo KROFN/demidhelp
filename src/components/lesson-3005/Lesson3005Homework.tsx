@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useCallback, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { FadeUp } from '@/lib/motion'
 import {
   ClipboardList,
   CheckCircle2,
@@ -148,15 +148,7 @@ export default function Lesson3005Homework() {
         })}
       </div>
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={homeworkMode}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
-          className="space-y-6"
-        >
+      <FadeUp key={homeworkMode} duration={0.3} className="space-y-6">
           {/* Task list */}
           <Card>
             <CardHeader>
@@ -222,8 +214,7 @@ export default function Lesson3005Homework() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
-      </AnimatePresence>
+      </FadeUp>
 
       <Separator />
 

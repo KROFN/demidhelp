@@ -1,8 +1,8 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
 import type { ReviewSection } from '@/lib/review/review-sources'
+import { FadeUp } from '@/lib/motion'
 
 interface ReviewDeckOverviewProps {
   sections: ReviewSection[]
@@ -58,12 +58,7 @@ export default function ReviewDeckOverview({ sections }: ReviewDeckOverviewProps
         if (!groupSections || groupSections.length === 0) return null
 
         return (
-          <motion.section
-            key={kind}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
+          <FadeUp key={kind} duration={0.3}>
             {/* Group header */}
             <div className="flex items-center gap-2 mb-4">
               <span className="text-lg">{kindIcons[kind]}</span>
@@ -107,7 +102,7 @@ export default function ReviewDeckOverview({ sections }: ReviewDeckOverviewProps
                 </div>
               ))}
             </div>
-          </motion.section>
+          </FadeUp>
         )
       })}
     </div>

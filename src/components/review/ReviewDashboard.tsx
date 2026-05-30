@@ -1,9 +1,9 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { BookOpen, ChevronRight } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { reviewDecks } from '@/lib/review/review-sources'
+import { FadeUp } from '@/lib/motion'
 
 const deckColors: Record<string, { bg: string; text: string; border: string }> = {
   '7': {
@@ -37,12 +37,7 @@ export default function ReviewDashboard() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="text-center"
-      >
+      <FadeUp duration={0.5} className="text-center">
         <div className="mx-auto mb-4 w-14 h-14 rounded-2xl bg-emerald-100 flex items-center justify-center">
           <BookOpen className="h-7 w-7 text-emerald-600" />
         </div>
@@ -53,25 +48,16 @@ export default function ReviewDashboard() {
           Это не полные уроки, а сжатые конспекты и быстрые тесты по уже пройденному
           материалу.
         </p>
-      </motion.div>
+      </FadeUp>
 
       {/* Deck cards */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2, duration: 0.4 }}
-      >
+      <FadeUp delay={0.2} duration={0.4}>
         <h2 className="text-lg font-semibold mb-3">Разделы</h2>
         <div className="space-y-3">
           {reviewDecks.map((deck, i) => {
             const colors = deckColors[deck.slug] || deckColors['7']
             return (
-              <motion.div
-                key={deck.slug}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 + i * 0.05, duration: 0.3 }}
-              >
+              <FadeUp key={deck.slug} delay={0.3 + i * 0.05} duration={0.3}>
                 <a href={`/review/${deck.slug}`}>
                   <Card
                     className={`cursor-pointer transition-all hover:shadow-md ${colors.border}`}
@@ -100,11 +86,11 @@ export default function ReviewDashboard() {
                     </CardContent>
                   </Card>
                 </a>
-              </motion.div>
+              </FadeUp>
             )
           })}
         </div>
-      </motion.div>
+      </FadeUp>
     </div>
   )
 }

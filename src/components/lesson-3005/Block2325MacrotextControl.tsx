@@ -1,127 +1,237 @@
 'use client'
 
-import { useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
+import { FadeUp, AnimatedWidth } from '@/lib/motion'
 import {
-  AlertTriangle,
   CheckCircle2,
-  FileText,
-  ListChecks,
-  SearchCheck,
+  Sparkles,
+  Lightbulb,
+  AlertTriangle,
+  ClipboardCheck,
 } from 'lucide-react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
-import { BLOCK2325_MACROTEXT, BLOCK2325_PRACTICE, BLOCK2325_REMINDERS } from '@/lib/lesson-data-30'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 import { useLesson30Store } from '@/lib/store-30'
+import {
+  BLOCK2325_REMINDERS,
+  BLOCK2325_MACROTEXT,
+} from '@/lib/lesson-data-30'
 
-const TASK_FORMAT = [
-  '№23 — содержание текста',
-  '№24 — типы речи / логико-смысловые отношения',
-  '№25 — лексика, фразеологизм, синонимы или антонимы',
+// ─── Checklist items for honest control ──────────────────────────────────────
+
+const CONTROL_CHECKLIST = [
+  'Я знаю, что №23 требует сверки с текстом, а не с памятью',
+  'Я знаю, что №24 проверяет тип речи и логическую связь по конкретным предложениям',
+  'Я знаю, что №25 требует выписать ровно то слово/сочетание, которое просит задание',
+  'Я понимаю, что реальные задания появятся после получения source-материалов',
+  'Я готов применить эти напоминания на реальном тексте',
 ] as const
 
-function sourceMissing() {
-  return (
-    BLOCK2325_MACROTEXT.sourceId.includes('TODO_LESSON_30_SOURCE') ||
-    BLOCK2325_MACROTEXT.text.includes('TODO_LESSON_30_SOURCE') ||
-    BLOCK2325_PRACTICE.some((task) => task.sourceId.includes('TODO_LESSON_30_SOURCE'))
-  )
-}
+// ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function Block2325MacrotextControl() {
-  const { completedBlocks, markBlockCompleted } = useLesson30Store()
+  const {
+    completedBlocks,
+    markBlockCompleted,
+    markSectionVisited,
+    visitedSections,
+  } = useLesson30Store()
+
+  const [activeSection, setActiveSection] = useState<'reminders' | 'checklist'>('reminders')
+  const [checklistState, setChecklistState] = useState<boolean[]>(
+    () => CONTROL_CHECKLIST.map(() => false)
+  )
+
   const isCompleted = completedBlocks.includes('block2325')
-  const missingSource = sourceMissing()
+
+  const allChecked = checklistState.every(Boolean)
+
+  const handleCheckChange = useCallback((index: number, checked: boolean) => {
+    setChecklistState((prev) => {
+      const next = [...prev]
+      next[index] = checked
+      return next
+    })
+  }, [])
 
   const handleComplete = useCallback(() => {
     markBlockCompleted('block2325')
   }, [markBlockCompleted])
 
+  const sections = [
+    { key: 'reminders' as const, label: 'Напоминания', shortLabel: 'Напом.', icon: Lightbulb },
+    { key: 'checklist' as const, label: 'Чек-лист', shortLabel: 'Чекл.', icon: ClipboardCheck },
+  ]
+
+  const allSectionsVisited = sections.every((s) =>
+    (visitedSections['block2325'] ?? []).includes(s.key)
+  )
+
+  const isPlaceholderText = BLOCK2325_MACROTEXT.sourceId === 'TODO_LESSON_30_SOURCE'
+
   return (
     <div className="space-y-6">
-      <section className="space-y-3">
-        <div className="space-y-2">
-          <Badge variant="secondary" className="w-fit">
-            105–115 минут
-          </Badge>
-          <h2 className="text-xl font-semibold tracking-tight">
-            №23–25. Макротекст: контроль без раздувания
-          </h2>
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            Здесь не появляется новая теория. Блок нужен только для короткой проверки, что навык макротекста не развалился после орфографии.
-          </p>
-        </div>
+      {/* Section tabs */}
+      <div className="flex gap-1 rounded-lg bg-muted p-1">
+        {sections.map((section) => {
+          const Icon = section.icon
+          return (
+            <button
+              key={section.key}
+              onClick={() => {
+                setActiveSection(section.key)
+                markSectionVisited('block2325', section.key)
+              }}
+              className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors flex-1 justify-center ${
+                activeSection === section.key
+                  ? 'bg-background shadow-sm text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Icon className="size-4" />
+              <span className="sm:hidden text-xs">{section.shortLabel}</span>
+              <span className="hidden sm:inline">{section.label}</span>
+            </button>
+          )
+        })}
+      </div>
 
-        {missingSource && (
-          <Alert className="border-sky-200 bg-sky-50 dark:border-sky-800 dark:bg-sky-950/40">
-            <AlertTriangle className="size-4 text-sky-600 dark:text-sky-400" />
-            <AlertTitle className="text-sky-900 dark:text-sky-300">
-              Source-файл для макротекста не подключён
-            </AlertTitle>
-            <AlertDescription className="text-sky-800 dark:text-sky-300">
-              По контентному lock нельзя придумывать текст и задания. Поэтому заглушка скрыта из тренировки, а блок оставлен как контрольный чек-лист до подключения реального корпуса.
-            </AlertDescription>
-          </Alert>
-        )}
-      </section>
+      {/* Reminders Section */}
+      {activeSection === 'reminders' && (
+        <FadeUp key="reminders" duration={0.3} className="space-y-4">
+            <Alert className="border-amber-300 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-800">
+              <Lightbulb className="size-4 text-amber-600 dark:text-amber-400" />
+              <AlertTitle className="text-amber-800 dark:text-amber-300">
+                Напоминания перед макротекстом
+              </AlertTitle>
+              <AlertDescription className="text-amber-700 dark:text-amber-400">
+                Запомните эти правила перед выполнением заданий 23–25.
+              </AlertDescription>
+            </Alert>
 
-      <section className="grid gap-3 sm:grid-cols-3">
-        {TASK_FORMAT.map((item) => (
-          <Card key={item}>
-            <CardContent className="flex h-full items-start gap-3 p-4">
-              <FileText className="mt-0.5 size-5 shrink-0 text-primary" />
-              <p className="text-sm font-medium leading-relaxed">{item}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </section>
-
-      <section className="space-y-3">
-        <div className="flex items-center gap-2">
-          <ListChecks className="size-5 text-primary" />
-          <h3 className="text-base font-semibold">Три напоминания перед текстом</h3>
-        </div>
-        <div className="space-y-2">
-          {BLOCK2325_REMINDERS.map((reminder, index) => (
-            <div key={reminder} className="flex gap-3 rounded-lg border bg-background p-3">
-              <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-sm font-semibold text-primary">
-                {index + 1}
-              </div>
-              <p className="text-sm leading-relaxed">{reminder}</p>
+            <div className="space-y-3">
+              {BLOCK2325_REMINDERS.map((reminder, i) => (
+                <Card key={i} className="overflow-hidden transition-shadow hover:shadow-md">
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3">
+                      <Badge variant="secondary" className="mt-0.5 shrink-0 text-xs">
+                        {i + 1}
+                      </Badge>
+                      <p className="text-sm font-medium leading-relaxed">{reminder}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <SearchCheck className="size-5" />
-            Как должен работать блок после подключения источника
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 text-sm text-muted-foreground">
-          <p>Показать прокручиваемый макротекст, затем отдельные поля ответа для №23, №24 и №25.</p>
-          <p>После проверки показать правильный ответ, доказательство в тексте и тип ошибки, если ответ неверный.</p>
-          <p>Сейчас это намеренно не рендерится как практика, потому что реальный текст отсутствует.</p>
-        </CardContent>
-      </Card>
+            {/* Honest notice about placeholder */}
+            {isPlaceholderText && (
+              <Alert className="border-rose-300 bg-rose-50 dark:bg-rose-950/40 dark:border-rose-800">
+                <AlertTriangle className="size-4 text-rose-600 dark:text-rose-400" />
+                <AlertTitle className="text-rose-800 dark:text-rose-300">
+                  Источник заданий ещё не предоставлен
+                </AlertTitle>
+                <AlertDescription className="text-rose-700 dark:text-rose-400">
+                  Реальный макротекст и задания для №23–25 появятся после получения source-материалов. Пока блок содержит только напоминания и контрольный чек-лист.
+                </AlertDescription>
+              </Alert>
+            )}
+        </FadeUp>
+      )}
+
+      {/* Checklist Section */}
+      {activeSection === 'checklist' && (
+        <FadeUp key="checklist" duration={0.3} className="space-y-4">
+            <Alert className="border-sky-300 bg-sky-50 dark:bg-sky-950/40 dark:border-sky-800">
+              <ClipboardCheck className="size-4 text-sky-600 dark:text-sky-400" />
+              <AlertTitle className="text-sky-800 dark:text-sky-300">
+                Контрольный чек-лист
+              </AlertTitle>
+              <AlertDescription className="text-sky-700 dark:text-sky-400">
+                Подтвердите, что вы усвоили ключевые принципы заданий 23–25.
+              </AlertDescription>
+            </Alert>
+
+            <Card>
+              <CardContent className="p-4 space-y-3">
+                {CONTROL_CHECKLIST.map((item, i) => (
+                  <div
+                    key={i}
+                    className="flex items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-accent/30"
+                  >
+                    <Checkbox
+                      id={`checklist-${i}`}
+                      checked={checklistState[i]}
+                      onCheckedChange={(val) => handleCheckChange(i, !!val)}
+                      className="mt-0.5"
+                    />
+                    <Label
+                      htmlFor={`checklist-${i}`}
+                      className="cursor-pointer text-sm font-normal leading-snug"
+                    >
+                      {item}
+                    </Label>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Progress */}
+            <div className="rounded-lg border bg-accent/30 p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium">Прогресс чек-листа</span>
+                <span className="text-sm text-muted-foreground">
+                  {checklistState.filter(Boolean).length} из {CONTROL_CHECKLIST.length}
+                </span>
+              </div>
+              <div className="h-2 rounded-full bg-muted overflow-hidden">
+                <AnimatedWidth
+                  percentage={(checklistState.filter(Boolean).length / CONTROL_CHECKLIST.length) * 100}
+                  duration={0.5}
+                  className="h-full rounded-full bg-emerald-500"
+                />
+              </div>
+            </div>
+        </FadeUp>
+      )}
 
       <Separator />
 
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground">
-          Блок можно отметить как пройденный после фиксации напоминаний.
-        </p>
+      {/* Complete Block */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="space-y-1">
+          <p className="text-sm text-muted-foreground">
+            {allChecked
+              ? 'Все пункты подтверждены. Готовы завершить блок?'
+              : `Подтвердите все ${CONTROL_CHECKLIST.length} пунктов чек-листа`}
+          </p>
+          {allChecked && !allSectionsVisited && (
+            <p className="text-xs text-amber-600 dark:text-amber-400">
+              Совет: посетите все вкладки блока перед завершением
+            </p>
+          )}
+        </div>
         <Button
           onClick={handleComplete}
-          disabled={isCompleted}
+          disabled={isCompleted || !allChecked}
           variant={isCompleted ? 'outline' : 'default'}
         >
-          <CheckCircle2 className="mr-2 size-4" />
-          {isCompleted ? 'Блок пройден' : 'Зафиксировал напоминания'}
+          {isCompleted ? (
+            <>
+              <CheckCircle2 className="size-4 mr-2" />
+              Блок пройден
+            </>
+          ) : (
+            <>
+              <CheckCircle2 className="size-4 mr-2" />
+              Завершить блок
+            </>
+          )}
         </Button>
       </div>
     </div>

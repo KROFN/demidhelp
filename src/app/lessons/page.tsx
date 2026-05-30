@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { FadeUp } from '@/lib/motion'
 import {
   GraduationCap,
   ChevronRight,
@@ -11,7 +11,6 @@ import {
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { getAllLessons } from '@/lib/lessons'
 
@@ -22,12 +21,7 @@ export default function LessonsListPage() {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100">
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-12">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-10"
-        >
+        <FadeUp duration={0.5} className="text-center mb-10">
           <div className="mx-auto mb-4 w-14 h-14 rounded-2xl bg-emerald-100 flex items-center justify-center">
             <GraduationCap className="h-7 w-7 text-emerald-600" />
           </div>
@@ -35,7 +29,7 @@ export default function LessonsListPage() {
           <p className="text-muted-foreground mt-2">
             Выберите урок для начала занятий
           </p>
-        </motion.div>
+        </FadeUp>
 
         {/* Lessons list */}
         <div className="space-y-4">
@@ -64,12 +58,7 @@ export default function LessonsListPage() {
                   : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 border-slate-300'
 
             return (
-              <motion.div
-                key={lesson.slug}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1, duration: 0.4 }}
-              >
+              <FadeUp key={lesson.slug} delay={i * 0.1} duration={0.4}>
                 <a href={`/lessons/${lesson.slug}`}>
                   <Card className="transition-all hover:shadow-md hover:border-emerald-300 cursor-pointer group">
                     <CardHeader className="pb-2">
@@ -103,7 +92,7 @@ export default function LessonsListPage() {
                     </CardContent>
                   </Card>
                 </a>
-              </motion.div>
+              </FadeUp>
             )
           })}
         </div>

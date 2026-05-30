@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Eye, CheckCircle2, RotateCcw, XCircle, ArrowRight } from 'lucide-react'
+import { FadeUp } from '@/lib/motion'
+import { Eye, CheckCircle2, RotateCcw, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
@@ -70,11 +70,7 @@ export default function ReviewFastTest({
   // Finished state
   if (isFinished) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-6"
-      >
+      <FadeUp className="space-y-6">
         <div className="text-center space-y-2">
           <h2 className="text-2xl font-bold">Тест завершён!</h2>
           <p className="text-muted-foreground">
@@ -109,7 +105,7 @@ export default function ReviewFastTest({
             Ещё раз
           </Button>
         </div>
-      </motion.div>
+      </FadeUp>
     )
   }
 
@@ -131,14 +127,7 @@ export default function ReviewFastTest({
       </Badge>
 
       {/* Question card */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentQuestion.id}
-          initial={{ opacity: 0, x: 30 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -30 }}
-          transition={{ duration: 0.2 }}
-        >
+      <FadeUp key={currentQuestion.id} duration={0.2}>
           <Card className="border-2 shadow-lg">
             <CardContent className="p-6 space-y-6">
               {/* Question */}
@@ -198,8 +187,7 @@ export default function ReviewFastTest({
               )}
             </CardContent>
           </Card>
-        </motion.div>
-      </AnimatePresence>
+      </FadeUp>
     </div>
   )
 }

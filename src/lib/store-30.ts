@@ -163,6 +163,42 @@ export const useLesson30Store = create<Lesson30State>()(
     }),
     {
       name: 'ege-lesson-30-storage',
+      // Only persist the essential data — exclude volatile/computable fields
+      partialize: (state) => ({
+        lessonStarted: state.lessonStarted,
+        completedBlocks: state.completedBlocks,
+        // Slim down practiceAnswers: only store status + answer for rehydration
+        practiceAnswers: Object.fromEntries(
+          Object.entries(state.practiceAnswers).map(([id, a]) => [
+            id,
+            {
+              questionId: a.questionId,
+              blockId: a.blockId,
+              answer: a.answer,
+              mechanism: a.mechanism,
+              status: a.status,
+              errorNote: a.errorNote,
+              timestamp: a.timestamp,
+            },
+          ])
+        ),
+        blockProgress: state.blockProgress,
+        errorNotes: state.errorNotes,
+        homeworkChecks: state.homeworkChecks,
+        visitedSections: state.visitedSections,
+        homeworkMode: state.homeworkMode,
+      }),
+      // Use debounce for localStorage writes to reduce I/O
+      merge: (persisted, current) => {
+        if (!persisted || typeof persisted !== 'object') return current
+        const p = persisted as Partial<Lesson30State>
+        return {
+          ...current,
+          ...p,
+          // Don't persist currentBlock (volatile navigation state)
+          currentBlock: null,
+        }
+      },
     }
   )
 )
