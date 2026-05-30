@@ -4,12 +4,16 @@ import React, { useState, useCallback } from 'react'
 import { FadeUp, Rotate } from '@/lib/motion'
 import {
   BookOpen,
+  Sparkles,
   CheckCircle2,
-  ChevronDown,
   XCircle,
   AlertTriangle,
-  Sparkles,
+  ChevronDown,
   Lightbulb,
+  Eye,
+  ListChecks,
+  ThumbsUp,
+  ArrowRight,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -19,9 +23,13 @@ import { Separator } from '@/components/ui/separator'
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible'
 import { useLesson30Store } from '@/lib/store-30'
 import {
+  BLOCK14_WHAT_IT_CHECKS,
+  BLOCK14_HOW_TO_THINK,
+  BLOCK14_FULL_EXAMPLES,
   BLOCK14_ALGORITHM,
   BLOCK14_WORKED_EXAMPLES,
   BLOCK14_PRACTICE,
+  BLOCK14_SUMMARY,
   type Block14Mechanism,
 } from '@/lib/lesson-data-30'
 import MechanismTrainer, { type MechanismOption, type PracticeItem } from '@/components/lesson-3005/MechanismTrainer'
@@ -38,21 +46,9 @@ const MECHANISM_OPTIONS: MechanismOption[] = [
   { value: 'pol', label: 'пол-' },
 ]
 
-// ─── Algorithm step grouping ─────────────────────────────────────────────────
+// ─── Compact Worked Example Card ─────────────────────────────────────────────
 
-const ALGORITHM_GROUPS: { label: string; icon: string; stepIndices: number[] }[] = [
-  { label: 'Союз', icon: '🔗', stepIndices: [1] },
-  { label: 'Наречие', icon: '📍', stepIndices: [4] },
-  { label: 'Предлог', icon: '📐', stepIndices: [3] },
-  { label: 'Местоимение с предлогом / частицей', icon: '👤', stepIndices: [2] },
-  { label: 'Частица', icon: '✨', stepIndices: [] },
-  { label: 'Дефисная модель', icon: '➖', stepIndices: [5] },
-  { label: 'Пол-', icon: '🔤', stepIndices: [6] },
-]
-
-// ─── Sub-components ──────────────────────────────────────────────────────────
-
-function ExampleCard({
+function CompactExampleCard({
   example,
 }: {
   example: (typeof BLOCK14_WORKED_EXAMPLES)[number]
@@ -84,14 +80,6 @@ function ExampleCard({
         <CollapsibleContent>
           <CardContent className="pt-0 space-y-3">
             <div className="space-y-3">
-              <div className="rounded-lg bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 p-3">
-                <p className="text-xs font-medium text-sky-700 dark:text-sky-400 mb-1">
-                  Слово / конструкция
-                </p>
-                <p className="text-sm text-sky-900 dark:text-sky-200 font-medium">
-                  {example.word}
-                </p>
-              </div>
               <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 p-3">
                 <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400 mb-1">
                   Ответ
@@ -121,9 +109,85 @@ function ExampleCard({
   )
 }
 
-// ─── Main Component ──────────────────────────────────────────────────────────
+// ─── Full Example Card (Breakdown tab) ───────────────────────────────────────
 
-type SectionKey = 'theory' | 'algorithm' | 'practice'
+function FullExampleCard({
+  example,
+}: {
+  example: (typeof BLOCK14_FULL_EXAMPLES)[number]
+}) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <Collapsible open={open} onOpenChange={setOpen}>
+      <Card className="overflow-hidden transition-shadow hover:shadow-md">
+        <CollapsibleTrigger asChild>
+          <button className="w-full text-left cursor-pointer">
+            <CardHeader className="pb-0">
+              <div className="flex items-center justify-between gap-2">
+                <CardTitle className="text-sm font-semibold text-foreground leading-snug">
+                  {example.prompt}
+                </CardTitle>
+                <div className="flex items-center gap-2 shrink-0">
+                  <Badge variant="outline" className="text-xs">
+                    {example.mechanismLabel}
+                  </Badge>
+                  <Rotate rotated={open}>
+                    <ChevronDown className="size-4 text-muted-foreground" />
+                  </Rotate>
+                </div>
+              </div>
+            </CardHeader>
+          </button>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <CardContent className="pt-2 space-y-3">
+            {/* Step-by-step breakdown */}
+            <div className="space-y-2">
+              {example.steps.map((step, i) => (
+                <div
+                  key={i}
+                  className="flex gap-3 items-start rounded-lg bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 p-3"
+                >
+                  <span className="flex items-center justify-center size-6 rounded-full bg-sky-100 dark:bg-sky-900 text-sky-700 dark:text-sky-300 text-xs font-bold shrink-0 mt-0.5">
+                    {i + 1}
+                  </span>
+                  <div>
+                    <p className="text-xs font-bold text-sky-700 dark:text-sky-300 mb-0.5">
+                      {step.label}
+                    </p>
+                    <p className="text-sm text-sky-900 dark:text-sky-200">
+                      {step.content}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Wrong path / trap */}
+            <div className="rounded-lg bg-rose-50 dark:bg-amber-950/40 border border-rose-200 dark:border-amber-800 p-3">
+              <div className="flex items-center gap-2 mb-1">
+                <AlertTriangle className="size-4 text-rose-500 dark:text-amber-400 shrink-0" />
+                <p className="text-xs font-bold text-rose-700 dark:text-amber-400">
+                  Ловушка
+                </p>
+              </div>
+              <p className="text-sm text-rose-800 dark:text-amber-300">
+                {example.wrongPath}
+              </p>
+            </div>
+          </CardContent>
+        </CollapsibleContent>
+      </Card>
+    </Collapsible>
+  )
+}
+
+// ─── Section tabs type ───────────────────────────────────────────────────────
+
+type SectionKey = 'what-it-checks' | 'how-to-think' | 'breakdown' | 'practice' | 'summary'
+
+// ─── Main Component ──────────────────────────────────────────────────────────
 
 export default function Block14Spelling() {
   const {
@@ -133,9 +197,11 @@ export default function Block14Spelling() {
     practiceAnswers,
     markSectionVisited,
     visitedSections,
+    blockSummaryConfirmed,
+    confirmBlockSummary,
   } = useLesson30Store()
 
-  const [activeSection, setActiveSection] = useState<SectionKey>('theory')
+  const [activeSection, setActiveSection] = useState<SectionKey>('what-it-checks')
 
   const isCompleted = completedBlocks.includes('block14')
   const progress = blockProgress['block14']
@@ -147,16 +213,24 @@ export default function Block14Spelling() {
   const correctCount = progress.correctCount
   const incorrectCount = progress.incorrectCount
 
-  const canComplete = answeredCount >= 6
+  const isSummaryConfirmed = blockSummaryConfirmed['block14'] ?? false
+  const canComplete = answeredCount >= 6 || isSummaryConfirmed
 
   const handleComplete = useCallback(() => {
     markBlockCompleted('block14')
   }, [markBlockCompleted])
 
+  const handleConfirmSummary = useCallback(() => {
+    confirmBlockSummary('block14')
+    markBlockCompleted('block14')
+  }, [confirmBlockSummary, markBlockCompleted])
+
   const sections: { key: SectionKey; label: string; shortLabel: string; icon: React.ElementType }[] = [
-    { key: 'theory', label: 'Теория', shortLabel: 'Теор.', icon: Lightbulb },
-    { key: 'algorithm', label: 'Алгоритм', shortLabel: 'Алг.', icon: BookOpen },
+    { key: 'what-it-checks', label: 'Что проверяет', shortLabel: 'Провер.', icon: Eye },
+    { key: 'how-to-think', label: 'Как думать', shortLabel: 'Думать', icon: Lightbulb },
+    { key: 'breakdown', label: 'Разбор', shortLabel: 'Разбор', icon: BookOpen },
     { key: 'practice', label: 'Практика', shortLabel: 'Практ.', icon: Sparkles },
+    { key: 'summary', label: 'Итог', shortLabel: 'Итог', icon: ListChecks },
   ]
 
   const allSectionsVisited = sections.every((s) =>
@@ -186,7 +260,7 @@ export default function Block14Spelling() {
                 setActiveSection(section.key)
                 markSectionVisited('block14', section.key)
               }}
-              className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors flex-1 justify-center ${
+              className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-medium transition-colors flex-1 justify-center min-h-[44px] ${
                 activeSection === section.key
                   ? 'bg-background shadow-sm text-foreground'
                   : 'text-muted-foreground hover:text-foreground'
@@ -200,117 +274,236 @@ export default function Block14Spelling() {
         })}
       </div>
 
-      {/* Section content */}
-      {activeSection === 'theory' && (
-        <FadeUp key="theory" duration={0.3} className="space-y-4">
-            <Alert className="border-amber-300 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-800">
-              <AlertTriangle className="size-4 text-amber-600 dark:text-amber-400" />
-              <AlertTitle className="text-amber-800 dark:text-amber-300">
-                Алгоритм: Слитно, раздельно, дефис
-              </AlertTitle>
-              <AlertDescription className="text-amber-700 dark:text-amber-400">
-                Сначала определи часть речи, потом решай написание.
-              </AlertDescription>
-            </Alert>
+      {/* ── Tab 1: Что проверяет ── */}
+      {activeSection === 'what-it-checks' && (
+        <FadeUp key="what-it-checks" duration={0.3} className="space-y-4">
+          {/* What the task wants */}
+          <Alert className="border-amber-300 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-800">
+            <Eye className="size-4 text-amber-600 dark:text-amber-400" />
+            <AlertTitle className="text-amber-800 dark:text-amber-300">
+              Что проверяет задание №14
+            </AlertTitle>
+            <AlertDescription className="text-amber-700 dark:text-amber-400">
+              {BLOCK14_WHAT_IT_CHECKS.whatTaskWants}
+            </AlertDescription>
+          </Alert>
 
-            {/* General steps */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Шаги алгоритма</CardTitle>
-                <CardDescription>
-                  Общий порядок определения написания
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ol className="space-y-3">
-                  {BLOCK14_ALGORITHM.map((step, i) => (
-                    <li key={i} className="flex gap-3">
-                      <span className="flex items-center justify-center size-7 rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0">
-                        {i + 1}
-                      </span>
-                      <span className="text-sm leading-relaxed pt-1">{step}</span>
-                    </li>
-                  ))}
-                </ol>
-              </CardContent>
-            </Card>
+          {/* Common mistakes */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <XCircle className="size-5 text-rose-500" />
+                Типичные ошибки
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ol className="space-y-3">
+                {BLOCK14_WHAT_IT_CHECKS.commonMistakes.map((mistake, i) => (
+                  <li key={i} className="flex gap-3 items-start">
+                    <span className="flex items-center justify-center size-6 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 text-xs font-bold shrink-0">
+                      {i + 1}
+                    </span>
+                    <span className="text-sm leading-relaxed pt-0.5">{mistake}</span>
+                  </li>
+                ))}
+              </ol>
+            </CardContent>
+          </Card>
 
-            {/* Grouped rules */}
-            <div className="space-y-3">
-              {ALGORITHM_GROUPS.filter((g) => g.stepIndices.length > 0).map(
-                (group) => (
-                  <Card key={group.label}>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                        <span>{group.icon}</span>
-                        {group.label}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-1">
-                        {group.stepIndices.map((idx) => (
-                          <li
-                            key={idx}
-                            className="text-sm text-muted-foreground flex gap-2"
-                          >
-                            <span className="text-primary font-medium shrink-0">
-                              Шаг {idx + 1}:
-                            </span>
-                            <span>{BLOCK14_ALGORITHM[idx]}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                )
-              )}
-            </div>
+          {/* Saving mechanism */}
+          <Card className="border-emerald-200 dark:border-emerald-800">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
+                <ThumbsUp className="size-5" />
+                Спасительный механизм
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm leading-relaxed text-emerald-900 dark:text-emerald-200">
+                {BLOCK14_WHAT_IT_CHECKS.savingMechanism}
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Key phrase */}
+          <div className="rounded-lg bg-muted border p-4 text-center">
+            <p className="text-sm font-semibold text-foreground">
+              №14 не про «как пишется», а про «что это в предложении».
+            </p>
+          </div>
         </FadeUp>
       )}
 
-      {/* ── Algorithm Section — examples ── */}
-      {activeSection === 'algorithm' && (
-        <FadeUp key="algorithm" duration={0.3} className="space-y-4">
-            <Alert className="border-sky-300 bg-sky-50 dark:bg-sky-950/40 dark:border-sky-800">
-              <BookOpen className="size-4 text-sky-600 dark:text-sky-400" />
-              <AlertDescription className="text-sky-700 dark:text-sky-400 text-sm">
-                Разбор примеров: нажмите на карточку, чтобы увидеть ответ и объяснение.
-              </AlertDescription>
-            </Alert>
+      {/* ── Tab 2: Как думать ── */}
+      {activeSection === 'how-to-think' && (
+        <FadeUp key="how-to-think" duration={0.3} className="space-y-4">
+          {/* Key phrase alert */}
+          <Alert className="border-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-800">
+            <Lightbulb className="size-4 text-emerald-600 dark:text-emerald-400" />
+            <AlertTitle className="text-emerald-800 dark:text-emerald-300">
+              Главное правило мысли
+            </AlertTitle>
+            <AlertDescription className="text-emerald-700 dark:text-emerald-400">
+              №14 не про «как пишется», а про «что это в предложении».
+            </AlertDescription>
+          </Alert>
 
+          {/* Visual step cards */}
+          <div className="space-y-3">
+            {BLOCK14_HOW_TO_THINK.map((item, i) => (
+              <Card key={i} className="overflow-hidden">
+                <CardContent className="p-4">
+                  <div className="flex gap-4 items-start">
+                    <div className="flex flex-col items-center gap-1 shrink-0">
+                      <span className="flex items-center justify-center size-8 rounded-full bg-primary/10 text-primary text-sm font-bold">
+                        {item.step}
+                      </span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm text-muted-foreground mb-1 font-medium">Ситуация</p>
+                      <p className="text-sm font-semibold text-foreground leading-snug">
+                        {item.step}
+                      </p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <ArrowRight className="size-4 text-emerald-500 shrink-0" />
+                        <p className="text-sm text-emerald-700 dark:text-emerald-400 font-medium">
+                          {item.action}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </FadeUp>
+      )}
+
+      {/* ── Tab 3: Разбор ── */}
+      {activeSection === 'breakdown' && (
+        <FadeUp key="breakdown" duration={0.3} className="space-y-4">
+          <Alert className="border-sky-300 bg-sky-50 dark:bg-sky-950/40 dark:border-sky-800">
+            <BookOpen className="size-4 text-sky-600 dark:text-sky-400" />
+            <AlertDescription className="text-sky-700 dark:text-sky-400 text-sm">
+              Пошаговый разбор заданий
+            </AlertDescription>
+          </Alert>
+
+          {/* Full worked examples */}
+          <div className="space-y-3">
+            {BLOCK14_FULL_EXAMPLES.map((example) => (
+              <FullExampleCard key={example.id} example={example} />
+            ))}
+          </div>
+
+          <Separator />
+
+          {/* Compact reference cards from existing worked examples */}
+          <div>
+            <p className="text-sm font-medium text-muted-foreground mb-3">
+              Быстрый справочник
+            </p>
             <div className="space-y-3">
               {BLOCK14_WORKED_EXAMPLES.map((example) => (
-                <ExampleCard key={example.id} example={example} />
+                <CompactExampleCard key={example.id} example={example} />
               ))}
             </div>
+          </div>
         </FadeUp>
       )}
 
-      {/* ── Practice Section ── */}
+      {/* ── Tab 4: Практика ── */}
       {activeSection === 'practice' && (
         <FadeUp key="practice" duration={0.3} className="space-y-4">
-            <Alert className="border-amber-300 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-800">
-              <Sparkles className="size-4 text-amber-600 dark:text-amber-400" />
-              <AlertDescription className="text-amber-700 dark:text-amber-400 text-sm">
-                Определите написание и механизм для каждого задания. Нужно пройти минимум 6 из 8.
-              </AlertDescription>
-            </Alert>
+          <Alert className="border-amber-300 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-800">
+            <Sparkles className="size-4 text-amber-600 dark:text-amber-400" />
+            <AlertDescription className="text-amber-700 dark:text-amber-400 text-sm">
+              Определите написание и механизм для каждого задания. Нужно пройти минимум 6 из 8.
+            </AlertDescription>
+          </Alert>
 
-            <MechanismTrainer
-              blockId="block14"
-              items={practiceItems}
-              mechanismOptions={MECHANISM_OPTIONS}
-              totalItems={BLOCK14_PRACTICE.length}
-              minToComplete={6}
-              answerPlaceholder="например: так же — раздельно"
-              answerLabel="Напишите слово / конструкцию с правильным написанием"
-            />
+          <MechanismTrainer
+            blockId="block14"
+            items={practiceItems}
+            mechanismOptions={MECHANISM_OPTIONS}
+            totalItems={BLOCK14_PRACTICE.length}
+            minToComplete={6}
+            answerPlaceholder="например: так же — раздельно"
+            answerLabel="Напишите слово / конструкцию с правильным написанием"
+          />
+        </FadeUp>
+      )}
+
+      {/* ── Tab 5: Итог ── */}
+      {activeSection === 'summary' && (
+        <FadeUp key="summary" duration={0.3} className="space-y-4">
+          {/* 3 key points */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <CheckCircle2 className="size-5 text-emerald-500" />
+                3 главных вывода
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ol className="space-y-3">
+                {BLOCK14_SUMMARY.keyPoints.map((point, i) => (
+                  <li key={i} className="flex gap-3 items-start">
+                    <span className="flex items-center justify-center size-7 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-sm font-bold shrink-0">
+                      {i + 1}
+                    </span>
+                    <span className="text-sm leading-relaxed pt-1">{point}</span>
+                  </li>
+                ))}
+              </ol>
+            </CardContent>
+          </Card>
+
+          {/* Typical mistakes */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <AlertTriangle className="size-5 text-amber-500" />
+                Типичные ошибки
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2">
+                {BLOCK14_SUMMARY.typicalMistakes.map((mistake, i) => (
+                  <li key={i} className="flex gap-3 items-start">
+                    <AlertTriangle className="size-4 text-amber-500 shrink-0 mt-0.5" />
+                    <span className="text-sm leading-relaxed">{mistake}</span>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+
+          {/* Confirm block button */}
+          {isSummaryConfirmed ? (
+            <Button
+              variant="outline"
+              disabled
+              className="w-full min-h-[48px] text-base"
+            >
+              <CheckCircle2 className="size-5 mr-2" />
+              Блок зафиксирован ✓
+            </Button>
+          ) : (
+            <Button
+              onClick={handleConfirmSummary}
+              className="w-full min-h-[48px] text-base bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              <CheckCircle2 className="size-5 mr-2" />
+              Зафиксировал блок
+            </Button>
+          )}
         </FadeUp>
       )}
 
       <Separator />
 
-      {/* Complete Block */}
+      {/* Bottom bar — Complete Block */}
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <p className="text-sm text-muted-foreground">
@@ -328,6 +521,7 @@ export default function Block14Spelling() {
           onClick={handleComplete}
           disabled={isCompleted || !canComplete}
           variant={isCompleted ? 'outline' : 'default'}
+          className="min-h-[44px]"
         >
           {isCompleted ? (
             <>

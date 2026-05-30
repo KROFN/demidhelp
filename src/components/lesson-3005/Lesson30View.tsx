@@ -26,6 +26,7 @@ import {
   MessageSquare,
   FileText,
   Clock,
+  Star,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -50,6 +51,7 @@ const BLOCKS: {
   color: string
   component: React.ReactNode
   timeEstimate: string
+  isRequired: boolean
 }[] = [
   {
     id: 'block12',
@@ -58,7 +60,8 @@ const BLOCKS: {
     icon: <PenTool className="h-4 w-4" />,
     color: 'emerald',
     component: <Block12VerbsParticiples />,
-    timeEstimate: '~20 мин',
+    timeEstimate: '~30 мин',
+    isRequired: true,
   },
   {
     id: 'block11',
@@ -67,7 +70,8 @@ const BLOCKS: {
     icon: <MessageSquare className="h-4 w-4" />,
     color: 'teal',
     component: <Block11Suffixes />,
-    timeEstimate: '~15 мин',
+    timeEstimate: '~25 мин',
+    isRequired: true,
   },
   {
     id: 'block14',
@@ -76,7 +80,8 @@ const BLOCKS: {
     icon: <BookOpen className="h-4 w-4" />,
     color: 'orange',
     component: <Block14Spelling />,
-    timeEstimate: '~20 мин',
+    timeEstimate: '~30 мин',
+    isRequired: true,
   },
   {
     id: 'block2325',
@@ -86,6 +91,7 @@ const BLOCKS: {
     color: 'sky',
     component: <Block2325MacrotextControl />,
     timeEstimate: '~10 мин',
+    isRequired: false,
   },
   {
     id: 'homework',
@@ -95,6 +101,7 @@ const BLOCKS: {
     color: 'amber',
     component: <Lesson3005Homework />,
     timeEstimate: '~15 мин',
+    isRequired: true,
   },
 ]
 
@@ -106,8 +113,8 @@ const colorClasses: Record<string, { bg: string; text: string; badge: string }> 
   amber: { bg: 'bg-amber-100', text: 'text-amber-600', badge: 'bg-amber-100 text-amber-700 border-amber-300' },
 }
 
-// ─── Main block IDs used for completion check ────────────────────────────────
-const MAIN_BLOCK_IDS: BlockId30[] = ['block12', 'block11', 'block14', 'block2325']
+// ─── Main block IDs used for completion check (block2325 is optional) ────────
+const MAIN_BLOCK_IDS: BlockId30[] = ['block12', 'block11', 'block14', 'homework']
 
 // ─── Error Review Component ─────────────────────────────────────────────────
 
@@ -123,7 +130,7 @@ function ErrorReviewSection({
   const [open, setOpen] = useState(false)
 
   const incorrectByBlock = blocks
-    .filter((b) => b.id !== 'homework')
+    .filter((b) => b.id !== 'homework' && b.id !== 'block2325')
     .map((block) => {
       const errors = Object.values(practiceAnswers).filter(
         (a) => a.blockId === block.id && a.status === 'incorrect'
@@ -214,10 +221,10 @@ export default function Lesson30View() {
   const [activeStep, setActiveStep] = useState(0)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  // Overall progress: X / 5 блоков (all 5 including homework)
-  const totalBlocks = BLOCKS.length // 5
-  const completedBlockCount = BLOCKS.filter((b) => completedBlocks.includes(b.id)).length
-  const overallProgress = Math.round((completedBlockCount / totalBlocks) * 100)
+  // Overall progress: X / required blocks
+  const totalRequired = BLOCKS.filter((b) => b.isRequired).length // 4
+  const completedRequiredCount = BLOCKS.filter((b) => b.isRequired && completedBlocks.includes(b.id)).length
+  const overallProgress = Math.round((completedRequiredCount / totalRequired) * 100)
 
   const mainBlocksCompleted = MAIN_BLOCK_IDS.filter((id) => completedBlocks.includes(id)).length
   const allMainBlocksCompleted = mainBlocksCompleted === MAIN_BLOCK_IDS.length
@@ -234,6 +241,7 @@ export default function Lesson30View() {
     color: 'emerald',
     component: null as React.ReactNode,
     timeEstimate: '',
+    isRequired: true,
   }
 
   const effectiveBlocks = allMainBlocksCompleted ? [...BLOCKS, COMPLETION_STEP] : BLOCKS
@@ -360,6 +368,11 @@ export default function Lesson30View() {
                             {block.icon}
                           </div>
                           <span className="text-xs font-medium flex-1 truncate">{block.shortLabel}</span>
+                          {!block.isRequired && (
+                            <Badge variant="outline" className="text-xs text-amber-600 border-amber-300 shrink-0">
+                              доп.
+                            </Badge>
+                          )}
                           <span className="text-xs text-muted-foreground flex items-center gap-1 shrink-0">
                             <Clock className="h-3 w-3" />
                             {block.timeEstimate}
@@ -433,12 +446,12 @@ export default function Lesson30View() {
             {/* Right: step counter */}
             <div className="flex items-center gap-2 shrink-0">
               <span className="text-xs text-muted-foreground">
-                {completedBlockCount}/{totalBlocks} блоков
+                {completedRequiredCount}/{totalRequired} блоков
               </span>
             </div>
           </div>
 
-          {/* Progress bar — shows overall completion, not position */}
+          {/* Progress bar */}
           <div className="pb-1.5">
             <Progress value={overallProgress} className="h-1" />
           </div>
@@ -452,7 +465,7 @@ export default function Lesson30View() {
               <div className="mb-3 px-1">
                 <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
                   <span>Общий прогресс</span>
-                  <span>{completedBlockCount}/{totalBlocks} блоков</span>
+                  <span>{completedRequiredCount}/{totalRequired} блоков</span>
                 </div>
                 <Progress value={overallProgress} className="h-1.5" />
                 <div className="flex gap-3 mt-1.5 text-xs text-muted-foreground">
@@ -488,6 +501,11 @@ export default function Lesson30View() {
                       {block.icon}
                     </div>
                     <span className="flex-1 text-left">{block.label}</span>
+                    {!block.isRequired && block.id !== 'completion' && (
+                      <Badge variant="outline" className="text-xs text-amber-600 border-amber-300 shrink-0">
+                        доп.
+                      </Badge>
+                    )}
                     {block.timeEstimate && (
                       <span className="text-xs text-muted-foreground flex items-center gap-1 shrink-0">
                         <Clock className="h-3 w-3" />
@@ -559,13 +577,13 @@ export default function Lesson30View() {
 
                   {/* Actions */}
                   <FadeUp delay={0.6} className="space-y-3 max-w-xs mx-auto">
-                    <Button asChild className="w-full bg-emerald-600 hover:bg-emerald-700">
+                    <Button asChild className="w-full bg-emerald-600 hover:bg-emerald-700 min-h-[48px]">
                       <Link href="/">
                         <HomeIcon className="h-4 w-4 mr-2" />
                         На главную
                       </Link>
                     </Button>
-                    <Button asChild variant="outline" className="w-full">
+                    <Button asChild variant="outline" className="w-full min-h-[48px]">
                       <Link href="/lessons">
                         <BookOpen className="h-4 w-4 mr-2" />
                         К урокам
@@ -573,7 +591,7 @@ export default function Lesson30View() {
                     </Button>
                     <Button
                       variant="outline"
-                      className="w-full text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700"
+                      className="w-full text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700 min-h-[48px]"
                       onClick={handleResetProgress}
                     >
                       <RotateCcw className="h-4 w-4 mr-2" />
@@ -598,7 +616,7 @@ export default function Lesson30View() {
               size="sm"
               onClick={goPrev}
               disabled={activeStep === 0}
-              className="shrink-0"
+              className="shrink-0 min-h-[44px]"
             >
               <ChevronLeft className="h-4 w-4 mr-1" />
               <span>Назад</span>
@@ -623,7 +641,9 @@ export default function Lesson30View() {
                           ? 'w-6 h-2.5 bg-emerald-500'
                           : isBlockCompleted
                             ? 'w-2.5 h-2.5 bg-emerald-300'
-                            : 'w-2.5 h-2.5 bg-slate-200'
+                            : !block.isRequired
+                              ? 'w-2.5 h-2.5 bg-sky-200'
+                              : 'w-2.5 h-2.5 bg-slate-200'
                         }
                       `}
                     />
@@ -636,7 +656,7 @@ export default function Lesson30View() {
               size="sm"
               onClick={goNext}
               disabled={activeStep === totalSteps - 1}
-              className="shrink-0 bg-emerald-600 hover:bg-emerald-700"
+              className="shrink-0 bg-emerald-600 hover:bg-emerald-700 min-h-[44px]"
             >
               <span>Далее</span>
               <ChevronRight className="h-4 w-4 ml-1" />
@@ -647,6 +667,7 @@ export default function Lesson30View() {
           {activeStep < totalSteps - 1 && (
             <p className="text-center text-xs text-muted-foreground mt-1.5">
               Далее: {effectiveBlocks[activeStep + 1].shortLabel}
+              {!effectiveBlocks[activeStep + 1].isRequired && ' (доп.)'}
             </p>
           )}
         </div>

@@ -10,6 +10,10 @@ import {
   AlertTriangle,
   ChevronDown,
   Lightbulb,
+  Eye,
+  ListChecks,
+  ThumbsUp,
+  ArrowRight,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -19,9 +23,13 @@ import { Separator } from '@/components/ui/separator'
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible'
 import { useLesson30Store, type BlockId30 } from '@/lib/store-30'
 import {
+  BLOCK12_WHAT_IT_CHECKS,
+  BLOCK12_HOW_TO_THINK,
+  BLOCK12_FULL_EXAMPLES,
   BLOCK12_ALGORITHM,
   BLOCK12_WORKED_EXAMPLES,
   BLOCK12_PRACTICE,
+  BLOCK12_SUMMARY,
   type Block12Mechanism,
 } from '@/lib/lesson-data-30'
 import MechanismTrainer, { type MechanismOption, type PracticeItem } from '@/components/lesson-3005/MechanismTrainer'
@@ -37,18 +45,16 @@ const MECHANISM_OPTIONS: MechanismOption[] = [
   { value: 'trap', label: 'исключение / мина' },
 ]
 
-function mechanismLabel(value: Block12Mechanism): string {
-  return MECHANISM_OPTIONS.find((m) => m.value === value)?.label ?? value
-}
+// ─── Section tabs type ───────────────────────────────────────────────────────
 
-// ─── Algorithm Step Card ─────────────────────────────────────────────────────
+type SectionKey = 'what-it-checks' | 'how-to-think' | 'breakdown' | 'practice' | 'summary'
 
-function AlgorithmStepCard({
-  step,
-  index,
+// ─── Full Example Card ───────────────────────────────────────────────────────
+
+function FullExampleCard({
+  example,
 }: {
-  step: string
-  index: number
+  example: (typeof BLOCK12_FULL_EXAMPLES)[number]
 }) {
   const [open, setOpen] = useState(false)
 
@@ -58,28 +64,49 @@ function AlgorithmStepCard({
         <CollapsibleTrigger asChild>
           <button className="w-full text-left cursor-pointer">
             <CardHeader className="pb-0">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="flex items-center justify-center size-7 rounded-full bg-primary/10 text-primary text-sm font-bold shrink-0">
-                    {index + 1}
-                  </span>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <CardTitle className="text-base font-semibold text-foreground">
-                    Шаг {index + 1}
+                    {example.word}
                   </CardTitle>
+                  <Badge variant="secondary" className="text-xs">
+                    {example.mechanismLabel}
+                  </Badge>
                 </div>
                 <Rotate rotated={open}>
-                  <ChevronDown className="size-5 text-muted-foreground" />
+                  <ChevronDown className="size-5 text-muted-foreground shrink-0" />
                 </Rotate>
               </div>
+              <CardDescription className="mt-1">
+                Ответ: <strong>{example.answer}</strong>
+              </CardDescription>
             </CardHeader>
           </button>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <CardContent className="pt-2">
-            <div className="rounded-lg bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 p-3">
-              <p className="text-sm text-sky-900 dark:text-sky-200">
-                {step}
-              </p>
+          <CardContent className="pt-2 space-y-0">
+            {example.steps.map((step, i) => (
+              <div
+                key={i}
+                className={`py-3 ${i > 0 ? 'border-t border-border/50' : ''}`}
+              >
+                <p className="text-xs font-bold text-primary mb-1">{step.label}</p>
+                <p className="text-sm text-foreground">{step.content}</p>
+              </div>
+            ))}
+            {/* Trap / wrongPath */}
+            <div className="mt-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 p-3">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="size-4 text-rose-500 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-xs font-semibold text-rose-700 dark:text-rose-400 mb-0.5">
+                    Ловушка
+                  </p>
+                  <p className="text-sm text-rose-800 dark:text-rose-300">
+                    {example.wrongPath}
+                  </p>
+                </div>
+              </div>
             </div>
           </CardContent>
         </CollapsibleContent>
@@ -88,7 +115,7 @@ function AlgorithmStepCard({
   )
 }
 
-// ─── Worked Example Card ─────────────────────────────────────────────────────
+// ─── Compact Worked Example Card ─────────────────────────────────────────────
 
 function WorkedExampleCard({
   example,
@@ -104,54 +131,38 @@ function WorkedExampleCard({
           <button className="w-full text-left cursor-pointer">
             <CardHeader className="pb-0">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base font-semibold text-foreground">
-                  {example.word}
-                </CardTitle>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <CardTitle className="text-base font-semibold text-foreground">
+                    {example.word}
+                  </CardTitle>
+                  <Badge variant="outline" className="text-xs">
+                    {example.mechanismLabel}
+                  </Badge>
+                </div>
                 <Rotate rotated={open}>
-                  <ChevronDown className="size-5 text-muted-foreground" />
+                  <ChevronDown className="size-5 text-muted-foreground shrink-0" />
                 </Rotate>
               </div>
-              <CardDescription className="mt-1">
-                Ответ: <strong>{example.answer}</strong>
-              </CardDescription>
             </CardHeader>
           </button>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <CardContent className="pt-2 space-y-3">
-            <div className="space-y-3">
-              <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 p-3">
-                <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400 mb-1">
-                  Ответ
-                </p>
-                <p className="text-sm text-emerald-900 dark:text-emerald-200 font-medium">
-                  {example.answer}
-                </p>
-              </div>
-              <div className="rounded-lg bg-violet-50 dark:bg-violet-950/40 border border-violet-200 dark:border-violet-800 p-3">
-                <p className="text-xs font-medium text-violet-700 dark:text-violet-400 mb-1">
-                  Механизм
-                </p>
-                <p className="text-sm text-violet-900 dark:text-violet-200 font-medium">
-                  {example.mechanismLabel}
-                </p>
-              </div>
-              <div className="rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 p-3">
-                <p className="text-sm text-amber-900 dark:text-amber-200">
-                  {example.explanation}
-                </p>
-              </div>
+          <CardContent className="pt-2 space-y-2">
+            <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 p-3">
+              <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400 mb-1">
+                Ответ
+              </p>
+              <p className="text-sm text-emerald-900 dark:text-emerald-200 font-medium">
+                {example.answer}
+              </p>
             </div>
+            <p className="text-sm text-foreground">{example.explanation}</p>
           </CardContent>
         </CollapsibleContent>
       </Card>
     </Collapsible>
   )
 }
-
-// ─── Section tabs type ───────────────────────────────────────────────────────
-
-type SectionKey = 'theory' | 'algorithm' | 'practice'
 
 // ─── Main Component ──────────────────────────────────────────────────────────
 
@@ -163,25 +174,35 @@ export default function Block12VerbsParticiples() {
     practiceAnswers,
     markSectionVisited,
     visitedSections,
+    blockSummaryConfirmed,
+    confirmBlockSummary,
   } = useLesson30Store()
 
-  const [activeSection, setActiveSection] = useState<SectionKey>('theory')
+  const [activeSection, setActiveSection] = useState<SectionKey>('what-it-checks')
 
   const isCompleted = completedBlocks.includes('block12')
   const progress = blockProgress['block12']
   const answeredCount = Object.keys(practiceAnswers).filter((id) =>
     id.startsWith('b12p')
   ).length
-  const canComplete = answeredCount >= 6
+  const isSummaryConfirmed = blockSummaryConfirmed['block12'] ?? false
+  const canComplete = answeredCount >= 6 || isSummaryConfirmed
 
   const handleComplete = useCallback(() => {
     markBlockCompleted('block12')
   }, [markBlockCompleted])
 
+  const handleConfirmSummary = useCallback(() => {
+    confirmBlockSummary('block12')
+    markBlockCompleted('block12')
+  }, [confirmBlockSummary, markBlockCompleted])
+
   const sections: { key: SectionKey; label: string; shortLabel: string; icon: React.ElementType }[] = [
-    { key: 'theory', label: 'Теория', shortLabel: 'Теор.', icon: Lightbulb },
-    { key: 'algorithm', label: 'Алгоритм', shortLabel: 'Алг.', icon: BookOpen },
+    { key: 'what-it-checks', label: 'Что проверяет', shortLabel: 'Провер.', icon: Eye },
+    { key: 'how-to-think', label: 'Как думать', shortLabel: 'Думать', icon: Lightbulb },
+    { key: 'breakdown', label: 'Разбор', shortLabel: 'Разбор', icon: BookOpen },
     { key: 'practice', label: 'Практика', shortLabel: 'Практ.', icon: Sparkles },
+    { key: 'summary', label: 'Итог', shortLabel: 'Итог', icon: ListChecks },
   ]
 
   const allSectionsVisited = sections.every((s) =>
@@ -197,6 +218,16 @@ export default function Block12VerbsParticiples() {
     mechanismLabel: q.mechanismLabel,
     explanation: q.explanation,
   }))
+
+  // Status text for bottom bar
+  let statusText = ''
+  if (answeredCount >= 6 && isSummaryConfirmed) {
+    statusText = 'Практика пройдена · Блок зафиксирован'
+  } else if (isSummaryConfirmed) {
+    statusText = 'Блок зафиксирован'
+  } else if (answeredCount >= 6) {
+    statusText = 'Практика пройдена'
+  }
 
   return (
     <div className="space-y-6">
@@ -225,76 +256,237 @@ export default function Block12VerbsParticiples() {
         })}
       </div>
 
-      {activeSection === 'theory' && (
-        <FadeUp key="theory" duration={0.3} className="space-y-4">
-            <Alert className="border-amber-300 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-800">
-              <AlertTriangle className="size-4 text-amber-600 dark:text-amber-400" />
-              <AlertTitle className="text-amber-800 dark:text-amber-300">
-                Алгоритм определения буквы
-              </AlertTitle>
-              <AlertDescription className="text-amber-700 dark:text-amber-400">
-                Не спрашивай «какая буква?». Сначала спроси: «что это за форма?»
-              </AlertDescription>
-            </Alert>
+      {/* ─── Tab 1: Что проверяет ─── */}
+      {activeSection === 'what-it-checks' && (
+        <FadeUp key="what-it-checks" duration={0.3} className="space-y-4">
+          {/* What the task wants */}
+          <Alert className="border-amber-300 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-800">
+            <Eye className="size-4 text-amber-600 dark:text-amber-400" />
+            <AlertTitle className="text-amber-800 dark:text-amber-300">
+              Что проверяет задание
+            </AlertTitle>
+            <AlertDescription className="text-amber-700 dark:text-amber-400">
+              {BLOCK12_WHAT_IT_CHECKS.whatTaskWants}
+            </AlertDescription>
+          </Alert>
 
-            <div className="space-y-3">
-              {BLOCK12_ALGORITHM.map((step, i) => (
-                <AlgorithmStepCard key={i} step={step} index={i} />
-              ))}
-            </div>
+          {/* Common mistakes */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base font-semibold flex items-center gap-2">
+                <XCircle className="size-5 text-rose-500" />
+                Типичные ошибки
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ol className="space-y-3">
+                {BLOCK12_WHAT_IT_CHECKS.commonMistakes.map((mistake, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <span className="flex items-center justify-center size-6 rounded-full bg-rose-100 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 text-xs font-bold shrink-0">
+                      {i + 1}
+                    </span>
+                    <span className="text-sm text-foreground">{mistake}</span>
+                  </li>
+                ))}
+              </ol>
+            </CardContent>
+          </Card>
+
+          {/* Saving mechanism */}
+          <Card className="border-emerald-200 dark:border-emerald-800">
+            <CardHeader>
+              <CardTitle className="text-base font-semibold flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
+                <ThumbsUp className="size-5" />
+                Спасительный механизм
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 p-3">
+                <p className="text-sm text-emerald-900 dark:text-emerald-200 font-medium">
+                  {BLOCK12_WHAT_IT_CHECKS.savingMechanism}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </FadeUp>
       )}
 
-      {/* Algorithm Section — worked examples */}
-      {activeSection === 'algorithm' && (
-        <FadeUp key="algorithm" duration={0.3} className="space-y-4">
-            <Alert className="border-sky-300 bg-sky-50 dark:bg-sky-950/40 dark:border-sky-800">
-              <Sparkles className="size-4 text-sky-600 dark:text-sky-400" />
-              <AlertDescription className="text-sky-700 dark:text-sky-400 text-sm">
-                Разобранные примеры: раскройте карточку, чтобы увидеть механизм и объяснение.
-              </AlertDescription>
-            </Alert>
+      {/* ─── Tab 2: Как думать ─── */}
+      {activeSection === 'how-to-think' && (
+        <FadeUp key="how-to-think" duration={0.3} className="space-y-4">
+          {/* Key phrase */}
+          <Alert className="border-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-800">
+            <Lightbulb className="size-4 text-emerald-600 dark:text-emerald-400" />
+            <AlertTitle className="text-emerald-800 dark:text-emerald-300">
+              Ключевая фраза
+            </AlertTitle>
+            <AlertDescription className="text-emerald-700 dark:text-emerald-400 font-medium">
+              Сначала производящий глагол. Потом спряжение или инфинитив.
+            </AlertDescription>
+          </Alert>
 
-            <div className="space-y-3">
+          {/* Visual step cards — route style */}
+          <div className="space-y-0">
+            {BLOCK12_HOW_TO_THINK.map((item, i) => (
+              <div key={i} className="relative">
+                {/* Connector arrow between steps */}
+                {i > 0 && (
+                  <div className="flex justify-center py-1">
+                    <ArrowRight className="size-4 text-muted-foreground/50 -rotate-90" />
+                  </div>
+                )}
+                <Card className="overflow-hidden transition-shadow hover:shadow-md">
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3">
+                      <span className="flex items-center justify-center size-7 rounded-full bg-primary/10 text-primary text-sm font-bold shrink-0 mt-0.5">
+                        {i + 1}
+                      </span>
+                      <div className="flex-1 space-y-1">
+                        <p className="text-sm font-bold text-foreground">{item.step}</p>
+                        <p className="text-sm text-muted-foreground">{item.action}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ))}
+          </div>
+        </FadeUp>
+      )}
+
+      {/* ─── Tab 3: Разбор ─── */}
+      {activeSection === 'breakdown' && (
+        <FadeUp key="breakdown" duration={0.3} className="space-y-4">
+          <Alert className="border-sky-300 bg-sky-50 dark:bg-sky-950/40 dark:border-sky-800">
+            <BookOpen className="size-4 text-sky-600 dark:text-sky-400" />
+            <AlertDescription className="text-sky-700 dark:text-sky-400 text-sm">
+              Пошаговый разбор заданий
+            </AlertDescription>
+          </Alert>
+
+          {/* Full worked examples */}
+          <div className="space-y-3">
+            {BLOCK12_FULL_EXAMPLES.map((example) => (
+              <FullExampleCard key={example.id} example={example} />
+            ))}
+          </div>
+
+          {/* Compact worked examples reference */}
+          <div className="pt-2">
+            <h3 className="text-sm font-semibold text-muted-foreground mb-3">
+              Быстрый справочник
+            </h3>
+            <div className="space-y-2">
               {BLOCK12_WORKED_EXAMPLES.map((example) => (
                 <WorkedExampleCard key={example.id} example={example} />
               ))}
             </div>
+          </div>
         </FadeUp>
       )}
 
-      {/* Practice Section */}
+      {/* ─── Tab 4: Практика ─── */}
       {activeSection === 'practice' && (
         <FadeUp key="practice" duration={0.3} className="space-y-4">
-            <Alert className="border-amber-300 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-800">
-              <Sparkles className="size-4 text-amber-600 dark:text-amber-400" />
-              <AlertDescription className="text-amber-700 dark:text-amber-400 text-sm">
-                Вставьте пропущенную букву и выберите механизм, по которому определяется гласная.
-              </AlertDescription>
-            </Alert>
+          <Alert className="border-amber-300 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-800">
+            <Sparkles className="size-4 text-amber-600 dark:text-amber-400" />
+            <AlertDescription className="text-amber-700 dark:text-amber-400 text-sm">
+              Вставьте пропущенную букву и выберите механизм, по которому определяется гласная.
+            </AlertDescription>
+          </Alert>
 
-            <MechanismTrainer
-              blockId="block12"
-              items={practiceItems}
-              mechanismOptions={MECHANISM_OPTIONS}
-              totalItems={BLOCK12_PRACTICE.length}
-              minToComplete={6}
-              answerPlaceholder="напишите полное слово..."
-              answerLabel="Вставьте пропущенную букву (напишите полное слово)"
-            />
+          <MechanismTrainer
+            blockId="block12"
+            items={practiceItems}
+            mechanismOptions={MECHANISM_OPTIONS}
+            totalItems={BLOCK12_PRACTICE.length}
+            minToComplete={6}
+            answerPlaceholder="напишите полное слово..."
+            answerLabel="Вставьте пропущенную букву (напишите полное слово)"
+          />
+        </FadeUp>
+      )}
+
+      {/* ─── Tab 5: Итог ─── */}
+      {activeSection === 'summary' && (
+        <FadeUp key="summary" duration={0.3} className="space-y-4">
+          {/* 3 key points */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base font-semibold flex items-center gap-2">
+                <ListChecks className="size-5 text-primary" />
+                3 главных вывода
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ol className="space-y-3">
+                {BLOCK12_SUMMARY.keyPoints.map((point, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <span className="flex items-center justify-center size-6 rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0">
+                      {i + 1}
+                    </span>
+                    <span className="text-sm text-foreground">{point}</span>
+                  </li>
+                ))}
+              </ol>
+            </CardContent>
+          </Card>
+
+          {/* Typical mistakes */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base font-semibold flex items-center gap-2 text-amber-700 dark:text-amber-400">
+                <AlertTriangle className="size-5" />
+                Типичные ошибки
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2">
+                {BLOCK12_SUMMARY.typicalMistakes.map((mistake, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <AlertTriangle className="size-4 text-amber-500 shrink-0 mt-0.5" />
+                    <span className="text-sm text-foreground">{mistake}</span>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+
+          {/* Confirm block button */}
+          {isSummaryConfirmed ? (
+            <div className="flex items-center justify-center gap-2 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 p-4">
+              <CheckCircle2 className="size-5 text-emerald-600 dark:text-emerald-400" />
+              <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+                Блок зафиксирован ✓
+              </span>
+            </div>
+          ) : (
+            <Button
+              onClick={handleConfirmSummary}
+              className="w-full min-h-[48px] bg-emerald-600 hover:bg-emerald-700 text-white"
+              size="lg"
+            >
+              <CheckCircle2 className="size-5 mr-2" />
+              Зафиксировал блок
+            </Button>
+          )}
         </FadeUp>
       )}
 
       <Separator />
 
       {/* Complete Block */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="space-y-1">
-          <p className="text-sm text-muted-foreground">
-            {canComplete
-              ? 'Достаточно заданий пройдено. Готовы завершить блок?'
-              : `Осталось пройти ещё ${Math.max(0, 6 - answeredCount)} заданий (минимум 6 из ${BLOCK12_PRACTICE.length})`}
-          </p>
+          {statusText ? (
+            <p className="text-sm text-muted-foreground">
+              {statusText}
+            </p>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Осталось пройти ещё {Math.max(0, 6 - answeredCount)} заданий (минимум 6 из {BLOCK12_PRACTICE.length}) или зафиксировать блок в Итоге
+            </p>
+          )}
           {canComplete && !allSectionsVisited && (
             <p className="text-xs text-amber-600 dark:text-amber-400">
               Совет: посетите все вкладки блока перед завершением
@@ -305,6 +497,7 @@ export default function Block12VerbsParticiples() {
           onClick={handleComplete}
           disabled={isCompleted || !canComplete}
           variant={isCompleted ? 'outline' : 'default'}
+          className="min-h-[44px]"
         >
           {isCompleted ? (
             <>

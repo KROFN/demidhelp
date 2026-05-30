@@ -4,12 +4,11 @@ import React, { useState, useCallback } from 'react'
 import { FadeUp, AnimatedWidth } from '@/lib/motion'
 import {
   CheckCircle2,
-  Sparkles,
   Lightbulb,
-  AlertTriangle,
   ClipboardCheck,
+  Clock,
 } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
@@ -19,7 +18,6 @@ import { Label } from '@/components/ui/label'
 import { useLesson30Store } from '@/lib/store-30'
 import {
   BLOCK2325_REMINDERS,
-  BLOCK2325_MACROTEXT,
 } from '@/lib/lesson-data-30'
 
 // ─── Checklist items for honest control ──────────────────────────────────────
@@ -28,7 +26,6 @@ const CONTROL_CHECKLIST = [
   'Я знаю, что №23 требует сверки с текстом, а не с памятью',
   'Я знаю, что №24 проверяет тип речи и логическую связь по конкретным предложениям',
   'Я знаю, что №25 требует выписать ровно то слово/сочетание, которое просит задание',
-  'Я понимаю, что реальные задания появятся после получения source-материалов',
   'Я готов применить эти напоминания на реальном тексте',
 ] as const
 
@@ -72,10 +69,16 @@ export default function Block2325MacrotextControl() {
     (visitedSections['block2325'] ?? []).includes(s.key)
   )
 
-  const isPlaceholderText = BLOCK2325_MACROTEXT.sourceId === 'TODO_LESSON_30_SOURCE'
-
   return (
     <div className="space-y-6">
+      {/* Optional badge */}
+      <div className="flex items-center gap-2">
+        <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400">
+          <Clock className="h-3 w-3 mr-1" />
+          Дополнительный блок
+        </Badge>
+      </div>
+
       {/* Section tabs */}
       <div className="flex gap-1 rounded-lg bg-muted p-1">
         {sections.map((section) => {
@@ -128,19 +131,6 @@ export default function Block2325MacrotextControl() {
                 </Card>
               ))}
             </div>
-
-            {/* Honest notice about placeholder */}
-            {isPlaceholderText && (
-              <Alert className="border-rose-300 bg-rose-50 dark:bg-rose-950/40 dark:border-rose-800">
-                <AlertTriangle className="size-4 text-rose-600 dark:text-rose-400" />
-                <AlertTitle className="text-rose-800 dark:text-rose-300">
-                  Источник заданий ещё не предоставлен
-                </AlertTitle>
-                <AlertDescription className="text-rose-700 dark:text-rose-400">
-                  Реальный макротекст и задания для №23–25 появятся после получения source-материалов. Пока блок содержит только напоминания и контрольный чек-лист.
-                </AlertDescription>
-              </Alert>
-            )}
         </FadeUp>
       )}
 
@@ -220,6 +210,7 @@ export default function Block2325MacrotextControl() {
           onClick={handleComplete}
           disabled={isCompleted || !allChecked}
           variant={isCompleted ? 'outline' : 'default'}
+          className="min-h-[44px]"
         >
           {isCompleted ? (
             <>

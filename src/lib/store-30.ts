@@ -37,6 +37,8 @@ export interface Lesson30State {
   homeworkChecks: Record<string, boolean[]>
   visitedSections: Record<string, string[]>
   homeworkMode: 'main' | 'light'
+  /** Tracks which blocks the student has confirmed via "Зафиксировал блок" button */
+  blockSummaryConfirmed: Record<string, boolean>
 
   // Actions
   startLesson: () => void
@@ -49,6 +51,7 @@ export interface Lesson30State {
   setHomeworkChecks: (checks: Record<string, boolean[]>) => void
   markSectionVisited: (blockId: string, sectionKey: string) => void
   setHomeworkMode: (mode: 'main' | 'light') => void
+  confirmBlockSummary: (blockId: string) => void
   resetLesson: () => void
 }
 
@@ -56,7 +59,7 @@ const defaultBlockProgress30: Record<BlockId30, BlockProgress30> = {
   block12: { blockId: 'block12', started: false, completed: false, correctCount: 0, incorrectCount: 0, totalQuestions: 8 },
   block11: { blockId: 'block11', started: false, completed: false, correctCount: 0, incorrectCount: 0, totalQuestions: 8 },
   block14: { blockId: 'block14', started: false, completed: false, correctCount: 0, incorrectCount: 0, totalQuestions: 8 },
-  block2325: { blockId: 'block2325', started: false, completed: false, correctCount: 0, incorrectCount: 0, totalQuestions: 3 },
+  block2325: { blockId: 'block2325', started: false, completed: false, correctCount: 0, incorrectCount: 0, totalQuestions: 0 },
   homework: { blockId: 'homework', started: false, completed: false, correctCount: 0, incorrectCount: 0, totalQuestions: 0 },
 }
 
@@ -72,6 +75,7 @@ export const useLesson30Store = create<Lesson30State>()(
       homeworkChecks: {},
       visitedSections: {},
       homeworkMode: 'main',
+      blockSummaryConfirmed: {},
 
       startLesson: () => set({ lessonStarted: true }),
 
@@ -149,6 +153,13 @@ export const useLesson30Store = create<Lesson30State>()(
 
       setHomeworkMode: (mode) => set({ homeworkMode: mode }),
 
+      confirmBlockSummary: (blockId) => set((state) => ({
+        blockSummaryConfirmed: {
+          ...state.blockSummaryConfirmed,
+          [blockId]: true,
+        }
+      })),
+
       resetLesson: () => set({
         lessonStarted: false,
         currentBlock: null,
@@ -159,6 +170,7 @@ export const useLesson30Store = create<Lesson30State>()(
         homeworkChecks: {},
         visitedSections: {},
         homeworkMode: 'main',
+        blockSummaryConfirmed: {},
       }),
     }),
     {
@@ -167,7 +179,6 @@ export const useLesson30Store = create<Lesson30State>()(
       partialize: (state) => ({
         lessonStarted: state.lessonStarted,
         completedBlocks: state.completedBlocks,
-        // Slim down practiceAnswers: only store status + answer for rehydration
         practiceAnswers: Object.fromEntries(
           Object.entries(state.practiceAnswers).map(([id, a]) => [
             id,
@@ -187,15 +198,14 @@ export const useLesson30Store = create<Lesson30State>()(
         homeworkChecks: state.homeworkChecks,
         visitedSections: state.visitedSections,
         homeworkMode: state.homeworkMode,
+        blockSummaryConfirmed: state.blockSummaryConfirmed,
       }),
-      // Use debounce for localStorage writes to reduce I/O
       merge: (persisted, current) => {
         if (!persisted || typeof persisted !== 'object') return current
         const p = persisted as Partial<Lesson30State>
         return {
           ...current,
           ...p,
-          // Don't persist currentBlock (volatile navigation state)
           currentBlock: null,
         }
       },

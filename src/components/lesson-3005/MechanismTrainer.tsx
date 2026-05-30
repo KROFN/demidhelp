@@ -257,6 +257,11 @@ function PracticeCard({
                           Правильный ответ: <strong>{item.answer}</strong>
                         </p>
                       )}
+                      {answerIsCorrect && !mechanismIsCorrect && (
+                        <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 font-medium">
+                          Ошибка была в механизме, не в букве — именно механизм определяет написание.
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -266,7 +271,7 @@ function PracticeCard({
                       <AlertTriangle className="size-5 text-amber-500 shrink-0" />
                       <div>
                         <p className="text-xs font-medium text-amber-700 dark:text-amber-400">
-                          Механизм: <strong>{item.mechanismLabel}</strong>
+                          Правильный механизм: <strong>{item.mechanismLabel}</strong>
                         </p>
                         <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
                           Вы выбрали: {mechanismOptions.find(o => o.value === selectedMechanism)?.label ?? selectedMechanism}

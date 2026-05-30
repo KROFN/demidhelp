@@ -227,6 +227,7 @@ export default function Lesson3005Homework() {
           onClick={handleComplete}
           disabled={isCompleted}
           variant={isCompleted ? 'outline' : 'default'}
+          className="min-h-[44px]"
         >
           {isCompleted ? (
             <>
