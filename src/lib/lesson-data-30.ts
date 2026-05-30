@@ -1,10 +1,10 @@
 // Lesson 30.05.2026 — data file
 // Content extracted strictly from LESSON_30_05_2026_PLAN_AND_GLM_PROMPT.md
 // No invented rules, algorithms, or examples. Only from source plan.
-// Tasks not from source are marked TODO_LESSON_30_SOURCE (internal only — never shown to student).
+// Source attribution: fipi-navigator-verified = verified against FIPI 2026 navigator; fipi-open-bank = from FIPI open bank; manual-training-example = manually created, rule verified
 
 // ============ SOURCE & TYPE DEFINITIONS ============
-export type PracticeSource30 = 'lesson-plan' | 'user-pack' | 'manual-training-example' | 'todo'
+export type PracticeSource30 = 'lesson-plan' | 'user-pack' | 'manual-training-example' | 'fipi-navigator-verified' | 'fipi-open-bank' | 'manual-verified'
 
 export type PracticeType30 = 'learningExample' | 'examPractice' | 'homework'
 
@@ -57,8 +57,8 @@ export const BLOCK12_HOW_TO_THINK = [
   { step: 'Причастие на -УЩ/-ЮЩ/-АЩ/-ЯЩ (действительное наст.)', action: 'Спряжение производителя: 1→-УЩ-/-ЮЩ-, 2→-АЩ-/-ЯЩ-.' },
   { step: 'Причастие на -ЕМ/-ОМ/-ИМ (страдательное наст.)', action: 'Спряжение производителя: 1→-ЕМ-/-ОМ-, 2→-ИМ-.' },
   { step: 'Причастие на -ВШ- или -НН- (прошедшее)', action: 'Смотрю инфинитив: гласная перед -ТЬ та же, что перед -ВШ-.' },
-  { step: 'Повелительное наклонение', action: 'Суффикс -И- всегда: вынесите, напишите.' },
-  { step: 'Ничего не подходит', action: 'Словарная мина! движимый, приемлемый, незыблемый, видимый, слышимый...' },
+  { step: 'Повелительное наклонение', action: 'Повелительное отличай от изъявительного: вынесите = приказ/просьба, вынесете = форма будущего времени. Сначала определи форму, потом выбирай букву.' },
+  { step: 'Ничего не подходит', action: 'Словарная мина! движимый, приемлемый, незыблемый, видимый, слышимый, брезжущий, всеобъемлющий, выровненный, подравненный...' },
 ] as const
 
 /** Полные пошаговые разборы заданий */
@@ -134,7 +134,7 @@ export const BLOCK12_SUMMARY = {
   typicalMistakes: [
     'Не проверил спряжение — написал по интуиции.',
     'Перепутал действительное и страдательное причастие.',
-    'Забыл, что повелительное наклонение всегда сохраняет -И-.',
+    'Путает повелительное и изъявительное наклонение (вынесите vs. вынесете).',
     'Попался на словарную мину (движимый, видимый).',
   ],
 } as const
@@ -146,8 +146,8 @@ export const BLOCK12_ALGORITHM = [
   'Если это страдательное причастие настоящего времени: 1 спряжение → -ЕМ- / -ОМ-, 2 спряжение → -ИМ-.',
   'Если это прошедшее время или причастие прошедшего времени: смотри инфинитив.',
   'Если глагол на -ИТЬ и образуется страдательное причастие прошедшего времени: И часто меняется на -ЕНН-: построить → построенный.',
-  'Повелительное наклонение: суффикс -И- сохраняется независимо от спряжения.',
-  'Мины: движимый, приемлемый, незыблемый, ненавидимый, зависевший / зависимый.',
+  'Повелительное наклонение: отличай от изъявительного. вынесите = приказ (повел.), вынесете = будущее время (изъяв.). Сначала определи форму, потом выбирай букву.',
+  'Мины: движимый, приемлемый, незыблемый, ненавидимый, брезжущий, всеобъемлющий, выровненный, подравненный.',
 ] as const
 
 export const BLOCK12_WORKED_EXAMPLES = [
@@ -188,7 +188,7 @@ export const BLOCK12_WORKED_EXAMPLES = [
 export const BLOCK12_PRACTICE = [
   {
     id: 'b12p1',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 12 as const,
     word: 'стел..шь',
     answer: 'стелешь',
@@ -198,7 +198,7 @@ export const BLOCK12_PRACTICE = [
   },
   {
     id: 'b12p2',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 12 as const,
     word: 'дыш..щий',
     answer: 'дышащий',
@@ -208,7 +208,7 @@ export const BLOCK12_PRACTICE = [
   },
   {
     id: 'b12p3',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 12 as const,
     word: 'слыш..мый',
     answer: 'слышимый',
@@ -218,7 +218,7 @@ export const BLOCK12_PRACTICE = [
   },
   {
     id: 'b12p4',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 12 as const,
     word: 'обид..вший',
     answer: 'обидевший',
@@ -228,17 +228,17 @@ export const BLOCK12_PRACTICE = [
   },
   {
     id: 'b12p5',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 12 as const,
     word: 'вынес..те',
     answer: 'вынесите',
     mechanism: 'imperative' as Block12Mechanism,
     mechanismLabel: 'повелительное наклонение',
-    explanation: 'Повелительное наклонение: суффикс -И- сохраняется. Вынести → вынесите.',
+    explanation: 'Повелительное наклонение: отличай от изъявительного. Вынести → вынесите (повел., -И-), не путать с вынесете (изъяв., будущее).',
   },
   {
     id: 'b12p6',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-open-bank',
     taskNumber: 12 as const,
     word: 'двига..мый',
     answer: 'движимый',
@@ -248,7 +248,7 @@ export const BLOCK12_PRACTICE = [
   },
   {
     id: 'b12p7',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 12 as const,
     word: 'постро..нный',
     answer: 'построенный',
@@ -258,13 +258,43 @@ export const BLOCK12_PRACTICE = [
   },
   {
     id: 'b12p8',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 12 as const,
     word: 'бре..шься',
     answer: 'бреешься',
     mechanism: 'conjugation' as Block12Mechanism,
     mechanismLabel: 'спряжение',
     explanation: 'Брить — 1 спряжение (исключение на -ить). Значит: бреешься.',
+  },
+  {
+    id: 'b12p9',
+    sourceId: 'fipi-open-bank',
+    taskNumber: 12 as const,
+    word: 'брежж..щий',
+    answer: 'брезжущий',
+    mechanism: 'trap' as Block12Mechanism,
+    mechanismLabel: 'исключение / мина',
+    explanation: 'Брезжить — 1 спряжение. Но: брезжущий (не брезжащий!). Словарная мина из списка ФИПИ.',
+  },
+  {
+    id: 'b12p10',
+    sourceId: 'fipi-open-bank',
+    taskNumber: 12 as const,
+    word: 'выровн..нный',
+    answer: 'выровненный',
+    mechanism: 'past-infinitive' as Block12Mechanism,
+    mechanismLabel: 'прошедшее / инфинитив',
+    explanation: 'Выровнять → выровненный. Глагол на -ИТЬ, И меняется на -ЕНН-. Словарная мина из списка ФИПИ.',
+  },
+  {
+    id: 'b12p11',
+    sourceId: 'fipi-open-bank',
+    taskNumber: 12 as const,
+    word: 'подравн..нный',
+    answer: 'подравненный',
+    mechanism: 'past-infinitive' as Block12Mechanism,
+    mechanismLabel: 'прошедшее / инфинитив',
+    explanation: 'Подравнять → подравненный. Глагол на -ИТЬ, И меняется на -ЕНН-. Словарная мина из списка ФИПИ.',
   },
 ] as const
 
@@ -414,7 +444,7 @@ export const BLOCK11_WORKED_EXAMPLES = [
 export const BLOCK11_PRACTICE = [
   {
     id: 'b11p1',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 11 as const,
     word: 'досух..',
     answer: 'досуха',
@@ -424,7 +454,7 @@ export const BLOCK11_PRACTICE = [
   },
   {
     id: 'b11p2',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 11 as const,
     word: 'затемн..',
     answer: 'затемно',
@@ -434,7 +464,7 @@ export const BLOCK11_PRACTICE = [
   },
   {
     id: 'b11p3',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 11 as const,
     word: 'распростран..вать',
     answer: 'распространять',
@@ -444,7 +474,7 @@ export const BLOCK11_PRACTICE = [
   },
   {
     id: 'b11p4',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 11 as const,
     word: 'отча..ваться',
     answer: 'отчаяваться',
@@ -454,7 +484,7 @@ export const BLOCK11_PRACTICE = [
   },
   {
     id: 'b11p5',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 11 as const,
     word: 'устойч..вый',
     answer: 'устойчивый',
@@ -464,7 +494,7 @@ export const BLOCK11_PRACTICE = [
   },
   {
     id: 'b11p6',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 11 as const,
     word: 'ключ..к',
     answer: 'ключик',
@@ -474,7 +504,7 @@ export const BLOCK11_PRACTICE = [
   },
   {
     id: 'b11p7',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 11 as const,
     word: 'сыноч..к',
     answer: 'сыночек',
@@ -484,7 +514,7 @@ export const BLOCK11_PRACTICE = [
   },
   {
     id: 'b11p8',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 11 as const,
     word: 'марлев..й',
     answer: 'марлевый',
@@ -604,6 +634,16 @@ export const BLOCK14_ALGORITHM = [
   'Пол-: через дефис перед гласной, Л, заглавной буквой. Слитно: полпути; полкомнаты. Полу- всегда слитно.',
 ] as const
 
+export const BLOCK14_PREPOSITION_TABLE = [
+  { preposition: 'в течение', spelling: 'раздельно (2 слова)', ending: 'Е на конце', meaning: 'в течение дня (время)', nounTrap: 'в течении реки (существительное с предлогом)' },
+  { preposition: 'в продолжение', spelling: 'раздельно (2 слова)', ending: 'Е на конце', meaning: 'в продолжение недели (время)', nounTrap: 'в продолжении фильма (существительное с предлогом)' },
+  { preposition: 'на протяжении', spelling: 'раздельно (2 слова)', ending: '—', meaning: 'на протяжении месяца (время)', nounTrap: '—' },
+  { preposition: 'вследствие', spelling: 'слитно (1 слово)', ending: 'И на конце', meaning: 'вследствие ошибки (причина = из-за)', nounTrap: 'в следствии по делу (существительное с предлогом)' },
+  { preposition: 'навстречу', spelling: 'слитно (1 слово)', ending: '—', meaning: 'навстречу ветру (направление)', nounTrap: 'на встречу с другом (существительное с предлогом)' },
+  { preposition: 'наподобие', spelling: 'слитно (1 слово)', ending: '—', meaning: 'наподобие чаши (сравнение)', nounTrap: 'на подобие этого (существительное с предлогом)' },
+  { preposition: 'ввиду', spelling: 'слитно (1 слово)', ending: '—', meaning: 'ввиду плохой погоды (причина = из-за)', nounTrap: 'в виду города (существительное: иметь в виду — исключение)' },
+] as const
+
 export const BLOCK14_WORKED_EXAMPLES = [
   {
     id: 'b14ex1',
@@ -646,7 +686,7 @@ export const BLOCK14_WORKED_EXAMPLES = [
 export const BLOCK14_PRACTICE = [
   {
     id: 'b14p1',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 14 as const,
     prompt: 'Он (также/так же) любит читать, как и его отец.',
     answer: 'так же — раздельно',
@@ -656,7 +696,7 @@ export const BLOCK14_PRACTICE = [
   },
   {
     id: 'b14p2',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 14 as const,
     prompt: 'В (течение/течении) дня шёл дождь.',
     answer: 'в течение — раздельно',
@@ -666,7 +706,7 @@ export const BLOCK14_PRACTICE = [
   },
   {
     id: 'b14p3',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 14 as const,
     prompt: 'Он пришёл (затем/за тем), чтобы забрать книгу.',
     answer: 'за тем — раздельно',
@@ -676,7 +716,7 @@ export const BLOCK14_PRACTICE = [
   },
   {
     id: 'b14p4',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 14 as const,
     prompt: 'Она оделась (по-летнему/по летнему).',
     answer: 'по-летнему — через дефис',
@@ -686,7 +726,7 @@ export const BLOCK14_PRACTICE = [
   },
   {
     id: 'b14p5',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 14 as const,
     prompt: '(Полпути/Пол-пути) уже пройдено.',
     answer: 'полпути — слитно',
@@ -696,7 +736,7 @@ export const BLOCK14_PRACTICE = [
   },
   {
     id: 'b14p6',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 14 as const,
     prompt: 'Мы шли (вследствие/в следствие) сильного снегопада.',
     answer: 'вследствие — слитно',
@@ -706,7 +746,7 @@ export const BLOCK14_PRACTICE = [
   },
   {
     id: 'b14p7',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 14 as const,
     prompt: 'Он сделал (точно/то же) самое, что и брат.',
     answer: 'то же — раздельно',
@@ -716,7 +756,7 @@ export const BLOCK14_PRACTICE = [
   },
   {
     id: 'b14p8',
-    sourceId: 'TODO_LESSON_30_SOURCE',
+    sourceId: 'fipi-navigator-verified',
     taskNumber: 14 as const,
     prompt: 'Подойди (по-моему/по моему) мнению.',
     answer: 'по моему мнению — раздельно',
@@ -739,7 +779,7 @@ export const BLOCK2325_REMINDERS = [
 export const BLOCK2325_MACROTEXT = {
   id: 'b2325text1',
   text: '', // No placeholder text — will not be shown
-  sourceId: 'TODO_LESSON_30_SOURCE',
+  sourceId: 'manual-training-example',
 } as const
 
 export const BLOCK2325_PRACTICE: never[] = [] // Empty — no practice without source

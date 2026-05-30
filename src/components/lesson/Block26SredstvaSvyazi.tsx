@@ -35,7 +35,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useLessonStore } from '@/lib/store'
-import { BLOCK26_MEANS, BLOCK26_PRACTICE_PAIRS, block26Content } from '@/lib/lesson-data'
+import { BLOCK26_MEANS, BLOCK26_PRACTICE_PAIRS, BLOCK26_WARNINGS, BLOCK26_NOT_MEANS, block26Content } from '@/lib/lesson-data'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -727,7 +727,7 @@ export default function Block26SredstvaSvyazi() {
               <div className="flex items-center gap-2">
                 <BookOpen className="size-5 text-orange-600 dark:text-orange-400" />
                 <h3 className="text-lg font-bold text-foreground">
-                  Все 12 средств связи
+                  Все {BLOCK26_MEANS.length} средств связи
                 </h3>
                 <Badge className="bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300 border-orange-300">
                   {BLOCK26_MEANS.length} средств
@@ -739,6 +739,56 @@ export default function Block26SredstvaSvyazi() {
                 ))}
               </div>
             </div>
+
+            {/* Critical Warnings */}
+            {BLOCK26_WARNINGS.map((warning) => (
+              <Alert key={warning.id} className="border-rose-400 bg-rose-50 dark:bg-rose-950/40 dark:border-rose-800">
+                <AlertOctagon className="size-4 text-rose-600 dark:text-rose-400" />
+                <AlertTitle className="text-rose-800 dark:text-rose-300 font-bold">
+                  {warning.title}
+                </AlertTitle>
+                <AlertDescription className="text-rose-700 dark:text-rose-400 space-y-2 mt-2">
+                  <p>{warning.text}</p>
+                  {'example' in warning && warning.example && (
+                    <div className="rounded bg-white/60 dark:bg-rose-900/30 p-2 border border-rose-200 dark:border-rose-700">
+                      <p className="text-sm font-mono">{warning.example}</p>
+                    </div>
+                  )}
+                </AlertDescription>
+              </Alert>
+            ))}
+
+            {/* What is NOT a means of connection */}
+            <Card className="border-rose-200 dark:border-rose-800">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <XCircle className="size-5 text-rose-600 dark:text-rose-400" />
+                  <CardTitle className="text-lg">Что обычно НЕ выбирают как средство связи в №26</CardTitle>
+                </div>
+                <CardDescription>
+                  Эти элементы обычно не считаются средствами связи предложений в тексте при выполнении задания №26. Если сомневаешься — выбирай более надёжное средство.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  {BLOCK26_NOT_MEANS.map((item, i) => (
+                    <li key={i} className="flex gap-3 items-start">
+                      <XCircle className="size-4 text-rose-500 shrink-0 mt-0.5" />
+                      <span className="text-sm">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Alert className="mt-4 border-amber-300 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-800">
+                  <AlertTriangle className="size-4 text-amber-600 dark:text-amber-400" />
+                  <AlertTitle className="text-amber-800 dark:text-amber-300 text-sm">
+                    Важно
+                  </AlertTitle>
+                  <AlertDescription className="text-amber-700 dark:text-amber-400 text-sm">
+                    В задании №26 выбираем конкретное средство связи между указанными предложениями. Не подменяй ответ общими наблюдениями вроде «одна тема», «одинаковое время глаголов», «похожее построение».
+                  </AlertDescription>
+                </Alert>
+              </CardContent>
+            </Card>
         </FadeUp>
       )}
 

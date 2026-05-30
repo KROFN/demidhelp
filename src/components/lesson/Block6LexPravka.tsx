@@ -23,11 +23,11 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion'
 import { useLessonStore } from '@/lib/store'
-import { BLOCK6_PLEONASMS, BLOCK6_COLLOCATIONS, BLOCK6_PRACTICE, BLOCK6_TRAINING_EXAMPLES, block6Content } from '@/lib/lesson-data'
+import { BLOCK6_PLEONASMS, BLOCK6_COLLOCATIONS, BLOCK6_TAUTOLOGIES, BLOCK6_PRACTICE, BLOCK6_TRAINING_EXAMPLES, block6Content } from '@/lib/lesson-data'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type ErrorTypeOption = 'pleonasm' | 'collocation'
+type ErrorTypeOption = 'pleonasm' | 'collocation' | 'tautology'
 
 interface PracticeState {
   answer: string
@@ -84,6 +84,29 @@ function CollocationExample({
   )
 }
 
+function TautologyExample({
+  item,
+}: {
+  item: (typeof BLOCK6_TAUTOLOGIES)[number]
+}) {
+  return (
+    <div className="rounded-lg border bg-card p-4 space-y-2 hover:shadow-sm transition-shadow">
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-base font-semibold text-foreground">{item.phrase}</span>
+        <Badge variant="outline" className="text-xs border-violet-300 text-violet-600 dark:border-violet-700 dark:text-violet-400">
+          лишнее: {item.extraWord}
+        </Badge>
+      </div>
+      <div className="flex items-center gap-2 text-sm">
+        <span className="text-rose-600 dark:text-rose-400 line-through">{item.extraWord}</span>
+        <ArrowRight className="size-4 text-muted-foreground shrink-0" />
+        <span className="text-emerald-600 dark:text-emerald-400 font-medium">{item.correct}</span>
+      </div>
+      <p className="text-xs text-muted-foreground">{item.explanation}</p>
+    </div>
+  )
+}
+
 function PracticeQuestion({
   question,
   index,
@@ -125,7 +148,8 @@ function PracticeQuestion({
     const answerCorrect = state.answer.trim().toLowerCase() === question.answer.toLowerCase()
     const typeCorrect =
       (question.errorType === 'pleonasm' && state.errorType === 'pleonasm') ||
-      (question.errorType === 'collocation' && state.errorType === 'collocation')
+      (question.errorType === 'collocation' && state.errorType === 'collocation') ||
+      (question.errorType === 'tautology' && state.errorType === 'tautology')
 
     let status: 'correct' | 'incorrect' = 'incorrect'
     if (answerCorrect && typeCorrect) {
@@ -220,6 +244,7 @@ function PracticeQuestion({
             {[
               { value: 'pleonasm', label: 'Плеоназм', desc: 'лишнее слово' },
               { value: 'collocation', label: 'Неверная сочетаемость', desc: 'замена слова' },
+              { value: 'tautology', label: 'Тавтология', desc: 'повтор однокоренных слов' },
             ].map((option) => (
               <div key={option.value} className="flex items-start gap-2">
                 <RadioGroupItem value={option.value} id={`${question.id}-${option.value}`} />
@@ -294,7 +319,7 @@ function PracticeQuestion({
                       <p className="text-xs text-rose-600 dark:text-rose-400 mt-0.5">
                         Тип ошибки:{' '}
                         <strong>
-                          {question.errorType === 'pleonasm' ? 'плеоназм' : 'неверная сочетаемость'}
+                          {question.errorType === 'pleonasm' ? 'плеоназм' : question.errorType === 'collocation' ? 'неверная сочетаемость' : 'тавтология'}
                         </strong>
                       </p>
                     </div>
@@ -428,6 +453,28 @@ export default function Block6LexPravka() {
                 <div className="grid gap-3 sm:grid-cols-1 lg:grid-cols-3">
                   {BLOCK6_COLLOCATIONS.map((item) => (
                     <CollocationExample key={item.id} item={item} />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Type 3: Tautology */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-violet-100 text-violet-700 dark:bg-violet-900 dark:text-violet-300 border-violet-300">
+                    Тип 3
+                  </Badge>
+                  <CardTitle className="text-lg">Тавтология</CardTitle>
+                </div>
+                <CardDescription>
+                  Повтор однокоренных или одинаковых по смыслу слов — ошибка, схожая с плеоназмом, но с другим механизмом: здесь повторяется корень, а не лишний смысл.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {BLOCK6_TAUTOLOGIES.map((item) => (
+                    <TautologyExample key={item.id} item={item} />
                   ))}
                 </div>
               </CardContent>

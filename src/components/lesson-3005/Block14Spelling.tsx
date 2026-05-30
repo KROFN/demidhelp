@@ -27,6 +27,7 @@ import {
   BLOCK14_HOW_TO_THINK,
   BLOCK14_FULL_EXAMPLES,
   BLOCK14_ALGORITHM,
+  BLOCK14_PREPOSITION_TABLE,
   BLOCK14_WORKED_EXAMPLES,
   BLOCK14_PRACTICE,
   BLOCK14_SUMMARY,
@@ -376,6 +377,49 @@ export default function Block14Spelling() {
               </Card>
             ))}
           </div>
+
+          {/* Производные предлоги — таблица */}
+          <Card className="border-sky-200 dark:border-sky-800">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <BookOpen className="size-5 text-sky-600 dark:text-sky-400" />
+                Таблица производных предлогов
+              </CardTitle>
+              <CardDescription>
+                Различайте предлоги (слитно/раздельно) и существительные с предлогом
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b bg-sky-50 dark:bg-sky-950/30">
+                      <th className="text-left p-2 font-semibold">Предлог</th>
+                      <th className="text-left p-2 font-semibold">Написание</th>
+                      <th className="text-left p-2 font-semibold">Окончание</th>
+                      <th className="text-left p-2 font-semibold">Значение</th>
+                      <th className="text-left p-2 font-semibold">Ловушка (существительное)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {BLOCK14_PREPOSITION_TABLE.map((row, i) => (
+                      <tr key={i} className="border-b last:border-b-0 hover:bg-sky-50/50 dark:hover:bg-sky-950/20">
+                        <td className="p-2 font-mono font-semibold text-sky-700 dark:text-sky-300">{row.preposition}</td>
+                        <td className="p-2">
+                          <Badge variant="outline" className={row.spelling.includes('раздельно') ? 'border-amber-300 text-amber-700 dark:border-amber-700 dark:text-amber-300' : 'border-emerald-300 text-emerald-700 dark:border-emerald-700 dark:text-emerald-300'}>
+                            {row.spelling}
+                          </Badge>
+                        </td>
+                        <td className="p-2 text-muted-foreground">{row.ending}</td>
+                        <td className="p-2">{row.meaning}</td>
+                        <td className="p-2 text-rose-600 dark:text-rose-400 text-xs">{row.nounTrap}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
         </FadeUp>
       )}
 

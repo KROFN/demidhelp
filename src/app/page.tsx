@@ -7,10 +7,10 @@ import {
   Target,
   Calendar,
   Layers,
-  Lock,
   Circle,
   Sparkles,
   TrendingUp,
+  Flame,
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { getUpcomingLessons } from '@/lib/lessons'
@@ -153,27 +153,23 @@ export default function DashboardPage() {
               </Card>
             </a>
 
-            {/* Тест по заданиям — disabled */}
-            <div className="relative">
-              <Card className="border-0 shadow-sm h-full opacity-60 cursor-not-allowed">
+            {/* Мясорубка заданий */}
+            <a href="/drill">
+              <Card className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer group h-full">
                 <CardContent className="p-5 flex items-center gap-4">
-                  <div className="w-11 h-11 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center shrink-0">
-                    <Lock className="h-5 w-5" />
+                  <div className="w-11 h-11 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 group-hover:bg-rose-200 transition-colors">
+                    <Flame className="h-5 w-5" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-sm text-muted-foreground">
-                      Тест по заданиям
-                    </h3>
-                    <p className="text-xs text-muted-foreground/70 mt-0.5">
-                       
+                    <h3 className="font-semibold text-sm">Мясорубка</h3>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Тренировка заданий ЕГЭ
                     </p>
                   </div>
+                  <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0 group-hover:text-rose-600 transition-colors" />
                 </CardContent>
               </Card>
-              <span className="absolute top-3 right-3">
-                <Lock className="h-3.5 w-3.5 text-slate-400" />
-              </span>
-            </div>
+            </a>
           </div>
         </FadeUp>
 

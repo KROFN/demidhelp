@@ -81,6 +81,11 @@ export default function ReviewDeckOverview({ sections }: ReviewDeckOverviewProps
                       {kindLabels[section.kind]}
                     </Badge>
                     <h4 className="font-semibold text-base">{section.title}</h4>
+                    {section.kes && section.kes.length > 0 && (
+                      <Badge variant="outline" className="text-xs border-slate-300 text-slate-600 dark:border-slate-600 dark:text-slate-400 font-mono">
+                        КЭС: {section.kes.join(' · ')}
+                      </Badge>
+                    )}
                   </div>
 
                   {/* Section content */}

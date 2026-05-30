@@ -1,12 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { GraduationCap, BookOpen, Layers, Menu, X } from 'lucide-react'
+import { GraduationCap, BookOpen, Layers, Menu, X, Flame } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 const navItems = [
   { label: 'Уроки', href: '/lessons', icon: BookOpen },
   { label: 'Повторение', href: '/review', icon: Layers },
+  { label: 'Мясорубка', href: '/drill', icon: Flame },
 ]
 
 export default function SiteHeader() {

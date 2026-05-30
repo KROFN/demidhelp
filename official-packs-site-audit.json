@@ -1,0 +1,472 @@
+[
+  {
+    "id": "ISS-01",
+    "severity": "P0",
+    "location": {
+      "file": "src/lib/lesson-data-30.ts",
+      "blockId": "block12",
+      "taskNumber": 12
+    },
+    "problem": "Task 12 mapped as Глаголы/причастия (КЭС 3.7.5+3.7.8) but should be Н/НН (КЭС 3.7.6)",
+    "officialReference": {
+      "pack": "Орфография",
+      "kesCodes": ["3.7.6"],
+      "rule": "Правописание Н/НН в различных частях речи"
+    },
+    "recommendedFix": "Remap Task 12 from КЭС 3.7.5+3.7.8 to КЭС 3.7.6 and relabel from Глаголы/причастия to Н/НН",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-02",
+    "severity": "P0",
+    "location": {
+      "file": "src/lib/review-sources.ts",
+      "route": "/review/9-15",
+      "taskNumber": 12
+    },
+    "problem": "Review deck 9-15 section №12 teaches wrong skill — maps to Глаголы/причастия instead of Н/НН",
+    "officialReference": {
+      "pack": "Орфография",
+      "kesCodes": ["3.7.6"],
+      "rule": "Правописание Н/НН в различных частях речи"
+    },
+    "recommendedFix": "Remap review deck 9-15 section №12 to КЭС 3.7.6 (Н/НН) and update all associated practice items",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-03",
+    "severity": "P0",
+    "location": {
+      "file": "src/lib/lesson-data-30.ts",
+      "exportName": "LESSON_3005_KES",
+      "taskNumber": 12
+    },
+    "problem": "Homework КЭС for Task 12 is wrong (3.7.5+3.7.8 should be 3.7.6)",
+    "officialReference": {
+      "pack": "Орфография",
+      "kesCodes": ["3.7.6"],
+      "rule": "Правописание Н/НН в различных частях речи"
+    },
+    "recommendedFix": "Change КЭС code in LESSON_3005_KES for Task 12 from 3.7.5+3.7.8 to 3.7.6",
+    "canAutoFix": true
+  },
+  {
+    "id": "ISS-04",
+    "severity": "P0",
+    "location": {
+      "file": "src/lib/lesson-data-30.ts",
+      "blockId": "block12/block11/block14",
+      "taskNumber": 12
+    },
+    "problem": "All practice items carry TODO_LESSON_30_SOURCE placeholder instead of real source attribution",
+    "currentText": "TODO_LESSON_30_SOURCE",
+    "officialReference": {
+      "pack": "Орфография",
+      "rule": "FIPI source attribution required for all practice items"
+    },
+    "recommendedFix": "Replace all TODO_LESSON_30_SOURCE placeholders with actual FIPI source references",
+    "canAutoFix": true
+  },
+  {
+    "id": "ISS-05",
+    "severity": "P1",
+    "location": {
+      "file": "src/lib/lesson-data.ts",
+      "blockId": "block4",
+      "taskNumber": 4
+    },
+    "problem": "Block 4 missing removed words from 2026 official list",
+    "officialReference": {
+      "pack": "Орфоэпия",
+      "kesCodes": ["3.1.1"],
+      "term": "Ударение — слова, удалённые из списка 2026"
+    },
+    "recommendedFix": "Add all words removed from the 2026 accent list to Block 4 and mark them as removed/no longer tested",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-06",
+    "severity": "P1",
+    "location": {
+      "file": "src/lib/lesson-data.ts",
+      "blockId": "block4",
+      "taskNumber": 4
+    },
+    "problem": "Block 4 missing Ё/Е trap warning for words where Е/Ё alternation changes accent position",
+    "officialReference": {
+      "pack": "Орфоэпия",
+      "kesCodes": ["3.1.1"],
+      "rule": "FIPI рекомендация: предупреждать о ловушке Ё/Е"
+    },
+    "recommendedFix": "Add explicit Ё/Е trap warnings for all relevant words in Block 4",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-07",
+    "severity": "P1",
+    "location": {
+      "file": "src/lib/lesson-data.ts",
+      "blockId": "block6",
+      "taskNumber": 6
+    },
+    "problem": "Block 6 missing тавтология as an error type in lexical editing task",
+    "officialReference": {
+      "pack": "Лексика",
+      "kesCodes": ["3.2.1"],
+      "term": "тавтология"
+    },
+    "recommendedFix": "Add тавтология as a recognized error type in Block 6 lexical editing section",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-08",
+    "severity": "P1",
+    "location": {
+      "file": "src/lib/lesson-data.ts",
+      "blockId": "block26",
+      "taskNumber": 26
+    },
+    "problem": "Block 26 missing 3 means of connection: антоним, числительное, вводное слово",
+    "officialReference": {
+      "pack": "Грамматика (синтаксис)",
+      "kesCodes": ["3.5.5"],
+      "term": "Средства связи предложений в тексте — антоним, числительное, вводное слово"
+    },
+    "recommendedFix": "Add антоним, числительное, вводное слово as means of connection in Block 26",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-09",
+    "severity": "P1",
+    "location": {
+      "file": "src/lib/lesson-data.ts",
+      "blockId": "block26",
+      "taskNumber": 26
+    },
+    "problem": "Block 26 наречие listed as a means of connection but should be местоименное наречие only",
+    "currentText": "наречие",
+    "officialReference": {
+      "pack": "Грамматика (синтаксис)",
+      "kesCodes": ["3.5.5"],
+      "term": "местоименное наречие",
+      "rule": "FIPI: только местоименные наречия (там, тут, здесь и т.д.) являются средством связи"
+    },
+    "recommendedFix": "Change наречие to местоименное наречие and add clarifying examples",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-10",
+    "severity": "P1",
+    "location": {
+      "file": "src/lib/lesson-data.ts",
+      "blockId": "block26",
+      "taskNumber": 26
+    },
+    "problem": "Block 26 missing FIPI exclusion list — words that are NOT means of connection",
+    "officialReference": {
+      "pack": "Грамматика (синтаксис)",
+      "kesCodes": ["3.5.5"],
+      "rule": "FIPI exclusion list: союзы, частицы, вводные слова-обращения и т.д. не являются средством связи"
+    },
+    "recommendedFix": "Add FIPI exclusion list clarifying which words are NOT means of connection",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-11",
+    "severity": "P1",
+    "location": {
+      "file": "src/lib/lesson-data.ts",
+      "blockId": "block26",
+      "taskNumber": 26
+    },
+    "problem": "Block 26 missing rule that verbs and participles are not used as means of connection",
+    "officialReference": {
+      "pack": "Грамматика (синтаксис)",
+      "kesCodes": ["3.5.5"],
+      "rule": "Глаголы и причастия не являются средством связи предложений в тексте"
+    },
+    "recommendedFix": "Add explicit rule that verbs/participles are excluded as means of connection",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-12",
+    "severity": "P1",
+    "location": {
+      "file": "src/lib/lesson-data.ts",
+      "blockId": "block26",
+      "taskNumber": 26
+    },
+    "problem": "Block 26 missing он/они distinction rule for pronoun connection",
+    "officialReference": {
+      "pack": "Грамматика (синтаксис)",
+      "kesCodes": ["3.5.5"],
+      "rule": "Местоимение 'он' связывает только с предшествующим существительным; 'они' — с множественным"
+    },
+    "recommendedFix": "Add он/они distinction rule with examples showing correct vs incorrect usage",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-13",
+    "severity": "P1",
+    "location": {
+      "file": "src/lib/lesson-data-30.ts",
+      "blockId": "block12",
+      "taskNumber": 12
+    },
+    "problem": "Block 12 imperative mood spelling rule is oversimplified — missing exceptions and nuanced cases",
+    "officialReference": {
+      "pack": "Орфография",
+      "kesCodes": ["3.7.5"],
+      "rule": "Правописание гласных в суффиксах глаголов повелительного наклонения"
+    },
+    "recommendedFix": "Expand imperative mood rule with full FIPI case coverage including exceptions",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-14",
+    "severity": "P1",
+    "location": {
+      "file": "src/lib/lesson-data-30.ts",
+      "blockId": "block12",
+      "taskNumber": 12
+    },
+    "problem": "Block 12 incomplete 'словарные мины' list — missing high-frequency trap words from FIPI analysis",
+    "officialReference": {
+      "pack": "Орфография",
+      "kesCodes": ["3.7.5"],
+      "term": "словарные мины"
+    },
+    "recommendedFix": "Expand словарные мины list with all high-frequency trap words from FIPI exam analysis",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-15",
+    "severity": "P1",
+    "location": {
+      "file": "src/lib/review-sources.ts",
+      "route": "/review"
+    },
+    "problem": "Review decks missing КЭС codes — no codifier mapping for any review card",
+    "officialReference": {
+      "pack": "Все паки",
+      "rule": "FIPI КЭС codifier requires every practice item to map to a specific КЭС code"
+    },
+    "recommendedFix": "Add КЭС codes to all review deck cards from FIPI codifier",
+    "canAutoFix": true
+  },
+  {
+    "id": "ISS-16",
+    "severity": "P1",
+    "location": {
+      "file": "src/lib/review-sources.ts",
+      "route": "/review/8",
+      "taskNumber": 8
+    },
+    "problem": "Deck 8 missing FIPI key word pairs for syntax task practice",
+    "officialReference": {
+      "pack": "Грамматика (синтаксис)",
+      "kesCodes": ["3.5.1", "3.5.2"],
+      "term": "Ключевые словосочетания FIPI"
+    },
+    "recommendedFix": "Add FIPI key word pairs to Deck 8 for syntax practice coverage",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-17",
+    "severity": "P1",
+    "location": {
+      "file": "src/lib/lesson-data-30.ts",
+      "blockId": "block14",
+      "taskNumber": 14
+    },
+    "problem": "Block 14 производные предлоги clarity issue — distinction between производные and непроизводные insufficiently explained",
+    "officialReference": {
+      "pack": "Орфография",
+      "kesCodes": ["3.7.2"],
+      "term": "производные предлоги",
+      "rule": "Слитное/раздельное написание производных предлогов"
+    },
+    "recommendedFix": "Add clear distinction rules and comparison table for производные vs непроизводные предлоги",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-18",
+    "severity": "P2",
+    "location": {
+      "file": "src/lib/lesson-data.ts",
+      "blockId": "block5",
+      "taskNumber": 5
+    },
+    "problem": "Block 5 only covers 6 out of 130+ paronym pairs required by FIPI",
+    "currentText": "6 пар паронимов",
+    "officialReference": {
+      "pack": "Лексика",
+      "kesCodes": ["3.2.1"],
+      "term": "Паронимы",
+      "rule": "FIPI полный список паронимов — 130+ пар"
+    },
+    "recommendedFix": "Expand Block 5 paronym coverage to include all 130+ FIPI paronym pairs",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-19",
+    "severity": "P2",
+    "location": {
+      "file": "src/lib/lesson-data.ts",
+      "blockId": "block22",
+      "taskNumber": 22
+    },
+    "problem": "Block 22 missing 3 ИВС terms: инверсия, парцелляция, риторический вопрос",
+    "officialReference": {
+      "pack": "Речь",
+      "kesCodes": ["3.6.1"],
+      "term": "Изобразительно-выразительные средства — инверсия, парцелляция, риторический вопрос"
+    },
+    "recommendedFix": "Add инверсия, парцелляция, риторический вопрос as ИВС terms in Block 22",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-20",
+    "severity": "P2",
+    "location": {
+      "file": "src/lib/lesson-data.ts",
+      "blockId": "block22",
+      "taskNumber": 22
+    },
+    "problem": "Block 22 definitions oversimplified — do not match FIPI exam-level precision required for correct identification",
+    "officialReference": {
+      "pack": "Речь",
+      "kesCodes": ["3.6.1"],
+      "rule": "FIPI определения ИВС должны соответствовать формулировкам кодификатора"
+    },
+    "recommendedFix": "Rewrite all ИВС definitions in Block 22 to match FIPI codifier formulations",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-21",
+    "severity": "P2",
+    "location": {
+      "file": "src/lib/lesson-data-30.ts",
+      "blockId": "block14",
+      "taskNumber": 14
+    },
+    "problem": "Block 14 пол-/полу- examples insufficient — missing edge cases and compound word variants",
+    "officialReference": {
+      "pack": "Орфография",
+      "kesCodes": ["3.7.1"],
+      "rule": "Правописание пол-/полу- в сложных словах"
+    },
+    "recommendedFix": "Add comprehensive examples covering all edge cases for пол-/полу- spelling rules",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-22",
+    "severity": "P2",
+    "location": {
+      "file": "src/lib/lesson-data-30.ts",
+      "blockId": "block2325",
+      "taskNumber": 23
+    },
+    "problem": "Blocks 23-25 (macrotext control) have no real practice — only theory without interactive exercises",
+    "officialReference": {
+      "pack": "Грамматика (синтаксис)",
+      "kesCodes": ["3.5.4", "3.5.5"],
+      "rule": "FIPI требует практических заданий на анализ структуры текста"
+    },
+    "recommendedFix": "Add interactive practice exercises for Blocks 23-25 macrotext analysis tasks",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-23",
+    "severity": "P2",
+    "location": {
+      "file": "src/lib/review-sources.ts",
+      "route": "/review"
+    },
+    "problem": "Review decks have no source labeling — cannot distinguish FIPI-sourced items from generated ones",
+    "officialReference": {
+      "pack": "Все паки",
+      "rule": "FIPI source attribution required for transparency and trust"
+    },
+    "recommendedFix": "Add source labels (FIPI/Generated/Adapted) to all review deck cards",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-24",
+    "severity": "P2",
+    "location": {
+      "file": "src/lib/lesson-data.ts"
+    },
+    "problem": "Lesson 29 has no FIPI-source markers on any practice items",
+    "officialReference": {
+      "pack": "Все паки",
+      "rule": "FIPI source attribution required for all practice content"
+    },
+    "recommendedFix": "Add FIPI-source markers to all Lesson 29 practice items",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-25",
+    "severity": "P2",
+    "location": {
+      "file": "src/lib/review-sources.ts",
+      "taskNumber": 15
+    },
+    "problem": "Review deck 9-15 task 15 content inconsistent with lesson 30 task 12 — same КЭС but different skill labels and examples",
+    "officialReference": {
+      "pack": "Орфография",
+      "kesCodes": ["3.7.6"],
+      "rule": "Consistency: same КЭС must have consistent skill labels across lesson and review"
+    },
+    "recommendedFix": "Align review deck 9-15 task 15 skill labels and examples with lesson 30 task 12",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-26",
+    "severity": "P3",
+    "location": {
+      "file": "src/lib/lesson-data.ts"
+    },
+    "problem": "Homework section missing КЭС codes — no codifier mapping for homework practice items",
+    "officialReference": {
+      "pack": "Все паки",
+      "rule": "FIPI КЭС codifier requires homework items to map to specific КЭС codes"
+    },
+    "recommendedFix": "Add КЭС codes to all homework practice items in lesson-data.ts",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-27",
+    "severity": "P3",
+    "location": {
+      "file": "src/lib/lesson-data.ts",
+      "blockId": "block22",
+      "taskNumber": 22
+    },
+    "problem": "Block 22 definitions oversimplified — less severe than ISS-20 but still below exam-level precision for some terms",
+    "officialReference": {
+      "pack": "Речь",
+      "kesCodes": ["3.6.1"],
+      "rule": "FIPI определения ИВС должны соответствовать формулировкам кодификатора"
+    },
+    "recommendedFix": "Review and refine remaining Block 22 definitions that were not addressed by ISS-20 fix",
+    "canAutoFix": false
+  },
+  {
+    "id": "ISS-28",
+    "severity": "P3",
+    "location": {
+      "file": "src/lib/review-sources.ts",
+      "route": "/review/7",
+      "taskNumber": 7
+    },
+    "problem": "Deck 7 has unequal depth across morphological categories — some topics have many cards while others have minimal coverage",
+    "officialReference": {
+      "pack": "Грамматика (морфология)",
+      "kesCodes": ["3.3.1", "3.3.2"],
+      "rule": "Balanced coverage across all morphological categories per FIPI specification"
+    },
+    "recommendedFix": "Rebalance Deck 7 card distribution to ensure equal depth across all morphological categories",
+    "canAutoFix": false
+  }
+]

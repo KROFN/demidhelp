@@ -16,6 +16,7 @@ export type ReviewSection = {
   title: string
   content: string[]
   kind: 'overview' | 'algorithm' | 'trap' | 'example' | 'before-test'
+  kes?: string[]  // КЭС codifier codes (optional)
 }
 
 export type FastTestQuestion = {
@@ -49,6 +50,7 @@ const deck7: ReviewDeck = {
       id: '7-overview',
       title: 'Коротко',
       kind: 'overview',
+      kes: ['3.5.1', '3.5.6'],
       content: [
         'Задание 7 проверяет правильную форму слова. Это не задание на "звучит нормально / не звучит". Нужно определить часть речи и проверить норму формы.',
         'Главная формула: Сначала часть речи. Потом норма формы.',
@@ -179,6 +181,7 @@ const deck8: ReviewDeck = {
       id: '8-overview',
       title: 'Коротко',
       kind: 'overview',
+      kes: ['3.6.1', '3.6.7'],
       content: [
         'Задание 8 — это классификатор грамматических ошибок. Тут нельзя просто читать предложение и думать "криво / нормально". Нужно определить, какой механизм сломан.',
         'Главная формула: Не ищем "некрасиво". Ищем тип ошибки.',
@@ -329,6 +332,7 @@ const deck9_15: ReviewDeck = {
       id: '9-algorithm',
       title: '№9. Корни',
       kind: 'algorithm',
+      kes: ['3.7.2'],
       content: [
         'Проверяется:',
         'проверяемые гласные',
@@ -349,6 +353,7 @@ const deck9_15: ReviewDeck = {
       id: '10-algorithm',
       title: '№10. Приставки',
       kind: 'algorithm',
+      kes: ['3.7.4'],
       content: [
         'Проверяется:',
         'З/С на конце приставки',
@@ -367,6 +372,7 @@ const deck9_15: ReviewDeck = {
       id: '11-algorithm',
       title: '№11. Суффиксы',
       kind: 'algorithm',
+      kes: ['3.7.5'],
       content: [
         '1. Определить часть речи.',
         '2. Найти суффикс.',
@@ -380,6 +386,7 @@ const deck9_15: ReviewDeck = {
       id: '12-algorithm',
       title: '№12. Глаголы и причастия',
       kind: 'algorithm',
+      kes: ['3.7.5', '3.7.8'],
       content: [
         'Главная мысль: Не знаешь глагол-основу — не решай причастие.',
         '',
@@ -394,6 +401,7 @@ const deck9_15: ReviewDeck = {
       id: '13-algorithm',
       title: '№13. НЕ/НИ',
       kind: 'algorithm',
+      kes: ['3.7.7'],
       content: [
         'НЕ чаще отрицает. НИ чаще усиливает отрицание. Но конкретный случай проверяется конструкцией.',
         '',
@@ -409,6 +417,7 @@ const deck9_15: ReviewDeck = {
       id: '14-algorithm',
       title: '№14. Слитно / раздельно / дефис',
       kind: 'algorithm',
+      kes: ['3.7.9'],
       content: [
         'Сначала часть речи или конструкция. Потом написание.',
         '',
@@ -426,6 +435,7 @@ const deck9_15: ReviewDeck = {
       id: '15-algorithm',
       title: '№15. Н/НН',
       kind: 'algorithm',
+      kes: ['3.7.6'],
       content: [
         'Главная мысль: Сначала отличи причастие от прилагательного.',
         '',
