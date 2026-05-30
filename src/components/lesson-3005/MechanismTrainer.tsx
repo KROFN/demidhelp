@@ -1,13 +1,13 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   AlertTriangle,
   CheckCircle2,
   ClipboardCheck,
-  FileQuestion,
   Lightbulb,
+  ListOrdered,
   PencilLine,
   RotateCcw,
   Route,
@@ -57,6 +57,8 @@ type Draft = {
   editing: boolean
 }
 
+type SectionKey = 'theory' | 'algorithm' | 'practice'
+
 type MechanismTrainerProps = {
   blockId: BlockId30
   title: string
@@ -76,16 +78,27 @@ function normalizeAnswer(value: string) {
   return value.trim().toLowerCase().replace(/ё/g, 'е').replace(/\s+/g, ' ')
 }
 
+function answerCandidates(answer: string) {
+  const normalized = normalizeAnswer(answer)
+  const primary = normalizeAnswer(answer.split(/\s+[—–-]\s+/)[0] ?? answer)
+  return Array.from(new Set([normalized, primary]))
+}
+
+function isAnswerCorrect(given: string, expected: string) {
+  const normalizedGiven = normalizeAnswer(given)
+  return answerCandidates(expected).includes(normalizedGiven)
+}
+
+function shortExpectedAnswer(answer: string) {
+  return answer.split(/\s+[—–-]\s+/)[0] ?? answer
+}
+
 function getPrompt(task: Pick<LessonTask, 'word' | 'prompt'>) {
   return task.word ?? task.prompt ?? ''
 }
 
 function optionLabel(options: readonly MechanismOption[], value: string) {
   return options.find((option) => option.value === value)?.label ?? value
-}
-
-function isPlaceholderSource(sourceId: string) {
-  return sourceId.includes('TODO_LESSON_30_SOURCE')
 }
 
 export default function MechanismTrainer({
@@ -113,6 +126,7 @@ export default function MechanismTrainer({
   } = useLesson30Store()
 
   const [drafts, setDrafts] = useState<Record<string, Draft>>({})
+  const [activeSection, setActiveSection] = useState<SectionKey>('theory')
 
   const progress = blockProgress[blockId]
   const isCompleted = completedBlocks.includes(blockId)
@@ -120,12 +134,6 @@ export default function MechanismTrainer({
   const answeredCount = answeredTasks.length
   const canComplete = answeredCount >= minToComplete
   const completionProgress = Math.min(100, Math.round((answeredCount / minToComplete) * 100))
-  const hasPlaceholders = tasks.some((task) => isPlaceholderSource(task.sourceId))
-
-  const sourceNotice = useMemo(() => {
-    if (!hasPlaceholders) return null
-    return 'Часть практики помечена TODO_LESSON_30_SOURCE: задания нужно заменить корпусом источника, но учебный маршрут и механика проверки уже готовы.'
-  }, [hasPlaceholders])
 
   const updateDraft = useCallback((taskId: string, patch: Partial<Draft>) => {
     setDrafts((current) => {
@@ -146,12 +154,32 @@ export default function MechanismTrainer({
     })
   }, [])
 
+  useEffect(() => {
+    tasks.forEach((task) => {
+      const existing = practiceAnswers[task.id]
+      if (!existing) return
+
+      const nextStatus =
+        isAnswerCorrect(existing.answer, task.answer) && existing.mechanism === task.mechanism
+          ? 'correct'
+          : 'incorrect'
+
+      if (existing.status !== nextStatus) {
+        setPracticeAnswer({
+          ...existing,
+          status: nextStatus,
+          timestamp: Date.now(),
+        })
+      }
+    })
+  }, [practiceAnswers, setPracticeAnswer, tasks])
+
   const handleCheck = useCallback(
     (task: LessonTask) => {
       const draft = drafts[task.id]
       if (!draft?.answer.trim() || !draft.mechanism) return
 
-      const answerCorrect = normalizeAnswer(draft.answer) === normalizeAnswer(task.answer)
+      const answerCorrect = isAnswerCorrect(draft.answer, task.answer)
       const mechanismCorrect = draft.mechanism === task.mechanism
       const status = answerCorrect && mechanismCorrect ? 'correct' : 'incorrect'
 
@@ -182,6 +210,12 @@ export default function MechanismTrainer({
     markBlockCompleted(blockId)
   }, [blockId, markBlockCompleted])
 
+  const sections: { key: SectionKey; label: string; icon: React.ElementType }[] = [
+    { key: 'theory', label: 'Теория', icon: Lightbulb },
+    { key: 'algorithm', label: 'Алгоритм', icon: ListOrdered },
+    { key: 'practice', label: 'Практика', icon: PencilLine },
+  ]
+
   return (
     <div className="space-y-6">
       <section className="space-y-4">
@@ -203,83 +237,117 @@ export default function MechanismTrainer({
           </AlertDescription>
         </Alert>
 
-        {sourceNotice && (
-          <Alert className="border-sky-200 bg-sky-50 dark:border-sky-800 dark:bg-sky-950/40">
-            <FileQuestion className="size-4 text-sky-600 dark:text-sky-400" />
-            <AlertDescription className="text-sky-800 dark:text-sky-300">
-              {sourceNotice}
-            </AlertDescription>
-          </Alert>
-        )}
+        <div className="grid grid-cols-3 gap-1 rounded-lg bg-muted p-1">
+          {sections.map((section) => {
+            const Icon = section.icon
+            return (
+              <button
+                key={section.key}
+                type="button"
+                onClick={() => setActiveSection(section.key)}
+                className={`flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                  activeSection === section.key
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <Icon className="size-4" />
+                <span>{section.label}</span>
+              </button>
+            )
+          })}
+        </div>
       </section>
 
-      <section className="space-y-3">
-        <div className="flex items-center gap-2">
-          <Route className="size-5 text-primary" />
-          <h3 className="text-base font-semibold">Маршрут решения</h3>
-        </div>
-        <div className="grid gap-2">
-          {algorithm.map((step, index) => (
-            <div key={`${blockId}-step-${index}`} className="flex gap-3 rounded-lg border bg-background p-3">
-              <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-sm font-semibold text-primary">
-                {index + 1}
-              </div>
-              <p className="text-sm leading-relaxed">{step}</p>
+      <AnimatePresence mode="wait">
+        {activeSection === 'theory' && (
+          <motion.section
+            key="theory"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="space-y-3"
+          >
+            <div className="flex items-center gap-2">
+              <Lightbulb className="size-5 text-amber-600" />
+              <h3 className="text-base font-semibold">Теория и разборы</h3>
             </div>
-          ))}
-        </div>
-      </section>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {examples.map((example) => (
+                <Card key={example.id} className="overflow-hidden">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base leading-snug">
+                      {getPrompt(example)}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3 text-sm">
+                    <div className="flex flex-wrap gap-2">
+                      <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100">
+                        {example.answer}
+                      </Badge>
+                      <Badge variant="outline">
+                        {example.mechanismLabel ?? optionLabel(mechanismOptions, example.mechanism)}
+                      </Badge>
+                    </div>
+                    <p className="leading-relaxed text-muted-foreground">{example.explanation}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </motion.section>
+        )}
 
-      <section className="space-y-3">
-        <div className="flex items-center gap-2">
-          <Lightbulb className="size-5 text-amber-600" />
-          <h3 className="text-base font-semibold">Разборы перед практикой</h3>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {examples.map((example) => (
-            <Card key={example.id} className="overflow-hidden">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base leading-snug">
-                  {getPrompt(example)}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm">
-                <div className="flex flex-wrap gap-2">
-                  <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100">
-                    {example.answer}
-                  </Badge>
-                  <Badge variant="outline">
-                    {example.mechanismLabel ?? optionLabel(mechanismOptions, example.mechanism)}
-                  </Badge>
+        {activeSection === 'algorithm' && (
+          <motion.section
+            key="algorithm"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="space-y-3"
+          >
+            <div className="flex items-center gap-2">
+              <Route className="size-5 text-primary" />
+              <h3 className="text-base font-semibold">Маршрут решения</h3>
+            </div>
+            <div className="grid gap-2">
+              {algorithm.map((step, index) => (
+                <div key={`${blockId}-step-${index}`} className="flex gap-3 rounded-lg border bg-background p-3">
+                  <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-sm font-semibold text-primary">
+                    {index + 1}
+                  </div>
+                  <p className="text-sm leading-relaxed">{step}</p>
                 </div>
-                <p className="leading-relaxed text-muted-foreground">{example.explanation}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
+              ))}
+            </div>
+          </motion.section>
+        )}
 
-      <section className="space-y-4">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <PencilLine className="size-5 text-primary" />
-            <h3 className="text-base font-semibold">Практика</h3>
-          </div>
-          <Badge variant="outline">
-            минимум {minToComplete} из {tasks.length}
-          </Badge>
-        </div>
+        {activeSection === 'practice' && (
+          <motion.section
+            key="practice"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="space-y-4"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <PencilLine className="size-5 text-primary" />
+                <h3 className="text-base font-semibold">Практика</h3>
+              </div>
+              <Badge variant="outline">
+                минимум {minToComplete} из {tasks.length}
+              </Badge>
+            </div>
 
-        <div className="space-y-3">
-          {tasks.map((task, index) => {
+            <div className="space-y-3">
+              {tasks.map((task, index) => {
             const existing = practiceAnswers[task.id]
             const draft = drafts[task.id]
             const editing = draft?.editing ?? !existing
             const answerValue = editing ? draft?.answer ?? '' : existing?.answer ?? ''
             const mechanismValue = editing ? draft?.mechanism ?? '' : existing?.mechanism ?? ''
-            const answerCorrect = existing
-              ? normalizeAnswer(existing.answer) === normalizeAnswer(task.answer)
-              : false
+            const answerCorrect = existing ? isAnswerCorrect(existing.answer, task.answer) : false
             const mechanismCorrect = existing ? existing.mechanism === task.mechanism : false
             const noteValue = draft?.note ?? errorNotes[task.id] ?? ''
 
@@ -291,11 +359,6 @@ export default function MechanismTrainer({
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge variant="outline">{index + 1}/{tasks.length}</Badge>
                         <Badge variant="secondary">№{task.taskNumber}</Badge>
-                        {isPlaceholderSource(task.sourceId) && (
-                          <Badge variant="outline" className="border-sky-300 text-sky-700">
-                            TODO source
-                          </Badge>
-                        )}
                       </div>
                       <CardTitle className="text-base leading-snug">{promptLabel}</CardTitle>
                     </div>
@@ -388,7 +451,7 @@ export default function MechanismTrainer({
                           </p>
                           <div className="mt-2 grid gap-2 text-xs sm:grid-cols-2">
                             <p>
-                              Ответ: {answerCorrect ? 'верно' : `нужно "${task.answer}"`}
+                              Ответ: {answerCorrect ? 'верно' : `нужно "${shortExpectedAnswer(task.answer)}"`}
                             </p>
                             <p>
                               Механизм: {mechanismCorrect
@@ -421,9 +484,11 @@ export default function MechanismTrainer({
                 </CardContent>
               </Card>
             )
-          })}
-        </div>
-      </section>
+              })}
+            </div>
+          </motion.section>
+        )}
+      </AnimatePresence>
 
       <Separator />
 
