@@ -64,6 +64,7 @@ server.log
 /agent-ctx/
 
 # Local working/source artifacts not needed for Vercel builds
+/new-version/
 /db/*.db
 /download/
 /examples/

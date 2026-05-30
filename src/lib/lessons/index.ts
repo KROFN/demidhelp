@@ -1,5 +1,4 @@
 import type { ComponentType } from 'react'
-import type { BlockId } from '@/lib/store'
 
 // ─── Lesson Registry Types ───────────────────────────────────────────────────
 
@@ -11,11 +10,11 @@ export interface LessonMeta {
   goal: string
   coverTopics: string[]
   skipTopics: string[]
-  blockIds: BlockId[]
+  blockIds: string[]
   /** Which block to prioritize (e.g. 'block26') */
-  priorityBlock?: BlockId
+  priorityBlock?: string
   /** Which blocks should be brief / control-only */
-  briefBlocks?: BlockId[]
+  briefBlocks?: string[]
   status: 'active' | 'completed' | 'planned'
 }
 
@@ -64,6 +63,41 @@ const lessonRegistry: Record<string, LessonEntry> = {
     },
     component: () =>
       import('@/components/lesson/Lesson29View').then((m) => ({
+        default: m.default,
+      })),
+  },
+  '2026-05-30': {
+    meta: {
+      slug: '2026-05-30',
+      title: 'Орфография без угадайки: №11, №12, №14',
+      date: '30.05.2026',
+      description:
+        'Глаголы и причастия, суффиксы, слитно-раздельно-дефис. В конце — короткая добивка 23–25.',
+      goal: 'Перестать угадывать букву и начать решать через механизм: форма слова → часть речи → правило → ответ',
+      coverTopics: [
+        '№12 — Глаголы и причастия: буква зависит от формы',
+        '№11 — Суффиксы: сначала часть речи',
+        '№14 — Слитно, раздельно, дефис: сначала часть речи',
+        '№23–25 — Короткая добивка макротекста',
+      ],
+      skipTopics: [
+        'Входной срез / диагностика',
+        'Сочинение / задание 27',
+        'Пунктуация',
+      ],
+      blockIds: [
+        'block12',
+        'block11',
+        'block14',
+        'block2325',
+        'homework',
+      ],
+      priorityBlock: 'block12',
+      briefBlocks: ['block2325'],
+      status: 'active',
+    },
+    component: () =>
+      import('@/components/lesson-3005/Lesson30View').then((m) => ({
         default: m.default,
       })),
   },
