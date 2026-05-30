@@ -56,7 +56,7 @@ const BLOCKS: {
   {
     id: 'block12',
     label: '№12. Глаголы и причастия',
-    shortLabel: 'Глаголы',
+    shortLabel: '№12 — Глаголы',
     icon: <PenTool className="h-4 w-4" />,
     color: 'emerald',
     component: <Block12VerbsParticiples />,
@@ -66,7 +66,7 @@ const BLOCKS: {
   {
     id: 'block11',
     label: '№11. Суффиксы',
-    shortLabel: 'Суффиксы',
+    shortLabel: '№11 — Суффиксы',
     icon: <MessageSquare className="h-4 w-4" />,
     color: 'teal',
     component: <Block11Suffixes />,
@@ -76,7 +76,7 @@ const BLOCKS: {
   {
     id: 'block14',
     label: '№14. Слитно, раздельно, дефис',
-    shortLabel: 'Слит/разд',
+    shortLabel: '№14 — Слит/разд',
     icon: <BookOpen className="h-4 w-4" />,
     color: 'orange',
     component: <Block14Spelling />,
@@ -85,8 +85,8 @@ const BLOCKS: {
   },
   {
     id: 'block2325',
-    label: '№23–25. Макротекст',
-    shortLabel: 'Макротекст',
+    label: '23–25. Макротекст (доп.)',
+    shortLabel: '23–25 — Доп.',
     icon: <FileText className="h-4 w-4" />,
     color: 'sky',
     component: <Block2325MacrotextControl />,
@@ -113,7 +113,8 @@ const colorClasses: Record<string, { bg: string; text: string; badge: string }> 
   amber: { bg: 'bg-amber-100', text: 'text-amber-600', badge: 'bg-amber-100 text-amber-700 border-amber-300' },
 }
 
-// ─── Main block IDs used for completion check (block2325 is optional) ────────
+// ─── Required blocks (progress counter) vs final steps vs optional ──────────
+const REQUIRED_BLOCK_IDS: BlockId30[] = ['block12', 'block11', 'block14']
 const MAIN_BLOCK_IDS: BlockId30[] = ['block12', 'block11', 'block14', 'homework']
 
 // ─── Error Review Component ─────────────────────────────────────────────────
@@ -221,9 +222,9 @@ export default function Lesson30View() {
   const [activeStep, setActiveStep] = useState(0)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  // Overall progress: X / required blocks
-  const totalRequired = BLOCKS.filter((b) => b.isRequired).length // 4
-  const completedRequiredCount = BLOCKS.filter((b) => b.isRequired && completedBlocks.includes(b.id)).length
+  // Overall progress: X / 3 required blocks (not counting homework or optional)
+  const totalRequired = REQUIRED_BLOCK_IDS.length // 3
+  const completedRequiredCount = REQUIRED_BLOCK_IDS.filter((id) => completedBlocks.includes(id)).length
   const overallProgress = Math.round((completedRequiredCount / totalRequired) * 100)
 
   const mainBlocksCompleted = MAIN_BLOCK_IDS.filter((id) => completedBlocks.includes(id)).length
@@ -446,7 +447,7 @@ export default function Lesson30View() {
             {/* Right: step counter */}
             <div className="flex items-center gap-2 shrink-0">
               <span className="text-xs text-muted-foreground">
-                {completedRequiredCount}/{totalRequired} блоков
+                {completedRequiredCount}/{totalRequired} обяз.
               </span>
             </div>
           </div>
@@ -464,8 +465,8 @@ export default function Lesson30View() {
               {/* Overall stats */}
               <div className="mb-3 px-1">
                 <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-                  <span>Общий прогресс</span>
-                  <span>{completedRequiredCount}/{totalRequired} блоков</span>
+                  <span>Обязательных блоков</span>
+                  <span>{completedRequiredCount}/{totalRequired}</span>
                 </div>
                 <Progress value={overallProgress} className="h-1.5" />
                 <div className="flex gap-3 mt-1.5 text-xs text-muted-foreground">

@@ -9,6 +9,7 @@ import {
   AlertTriangle,
   BookOpen,
   Zap,
+  ChevronDown,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -17,12 +18,15 @@ import { Separator } from '@/components/ui/separator'
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible'
 import { useLesson30Store } from '@/lib/store-30'
 import {
   HOMEWORK_30_MAIN,
   HOMEWORK_30_LIGHT,
   HOMEWORK_30_ERROR_MECHANISMS,
   HOMEWORK_30_FORMAT,
+  LESSON_3005_KES,
+  LESSON_3005_OPTIONAL_KES,
 } from '@/lib/lesson-data-30'
 
 // ─── Task Row ─────────────────────────────────────────────────────────────────
@@ -175,6 +179,53 @@ export default function Lesson3005Homework() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Where to get tasks */}
+          <Alert className="border-emerald-200 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-800">
+            <BookOpen className="size-4 text-emerald-600 dark:text-emerald-400" />
+            <AlertTitle className="text-emerald-800 dark:text-emerald-300">
+              Где брать задания
+            </AlertTitle>
+            <AlertDescription className="text-emerald-700 dark:text-emerald-400 text-sm">
+              Задания выдаёт преподаватель из корпуса.
+              Формат сдачи: номер задания → ответ → если ошибка, механизм ошибки.
+            </AlertDescription>
+          </Alert>
+
+          {/* КЭС урока — collapsible */}
+          <Collapsible>
+            <Card>
+              <CollapsibleTrigger asChild>
+                <button className="w-full text-left p-4 flex items-center justify-between hover:bg-accent/30 transition-colors rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <ListChecks className="size-5 text-primary" />
+                    <span className="text-sm font-semibold">КЭС урока</span>
+                  </div>
+                  <ChevronDown className="size-4 text-muted-foreground" />
+                </button>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className="px-4 pb-4 space-y-2">
+                  {LESSON_3005_KES.map((item) => (
+                    <div key={item.task} className="flex items-start gap-2 text-sm">
+                      <Badge variant="outline" className="shrink-0 text-xs">{item.task}</Badge>
+                      <span className="text-muted-foreground">{item.codes.join(', ')}</span>
+                      <span className="text-foreground">— {item.title}</span>
+                    </div>
+                  ))}
+                  <Separator className="my-2" />
+                  <p className="text-xs text-muted-foreground font-medium">Дополнительный блок 23–25</p>
+                  {LESSON_3005_OPTIONAL_KES.map((item) => (
+                    <div key={item.task} className="flex items-start gap-2 text-sm">
+                      <Badge variant="outline" className="shrink-0 text-xs">{item.task}</Badge>
+                      <span className="text-muted-foreground">{item.codes.join(', ')}</span>
+                      <span className="text-foreground">— {item.title}</span>
+                    </div>
+                  ))}
+                </div>
+              </CollapsibleContent>
+            </Card>
+          </Collapsible>
 
           {/* Format instruction */}
           <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950/40 dark:border-blue-800">

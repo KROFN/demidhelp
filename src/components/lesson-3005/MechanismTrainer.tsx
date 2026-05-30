@@ -49,6 +49,8 @@ export interface MechanismTrainerProps {
   answerPlaceholder?: string
   /** Label for the answer input field */
   answerLabel?: string
+  /** Instruction text shown in each practice card title */
+  instructionText?: string
 }
 
 // ─── Normalization ────────────────────────────────────────────────────────────
@@ -87,6 +89,7 @@ function PracticeCard({
   mechanismOptions,
   answerPlaceholder,
   answerLabel,
+  instructionText,
 }: {
   item: PracticeItem
   index: number
@@ -95,6 +98,7 @@ function PracticeCard({
   mechanismOptions: MechanismOption[]
   answerPlaceholder?: string
   answerLabel?: string
+  instructionText?: string
 }) {
   const {
     practiceAnswers,
@@ -161,7 +165,7 @@ function PracticeCard({
             {index + 1}/{totalItems}
           </Badge>
           <CardTitle className="text-lg">
-            Вставьте букву и определите механизм
+            {instructionText ?? 'Запишите ответ и выберите механизм'}
           </CardTitle>
           <div className="ml-auto">{statusIcon}</div>
         </div>
@@ -327,6 +331,7 @@ export default function MechanismTrainer({
   minToComplete,
   answerPlaceholder,
   answerLabel,
+  instructionText,
 }: MechanismTrainerProps) {
   const {
     practiceAnswers,
@@ -378,6 +383,7 @@ export default function MechanismTrainer({
             mechanismOptions={mechanismOptions}
             answerPlaceholder={answerPlaceholder}
             answerLabel={answerLabel}
+            instructionText={instructionText}
           />
         ))}
       </div>

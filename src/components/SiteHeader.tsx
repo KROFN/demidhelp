@@ -1,19 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { GraduationCap, BookOpen, Layers, Menu, X, Lock } from 'lucide-react'
+import { GraduationCap, BookOpen, Layers, Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 const navItems = [
   { label: 'Уроки', href: '/lessons', icon: BookOpen },
   { label: 'Повторение', href: '/review', icon: Layers },
-  {
-    label: 'ФИПИ-задания',
-    href: '#',
-    icon: Lock,
-    disabled: true,
-    tooltip: 'В следующих обновлениях',
-  },
 ]
 
 export default function SiteHeader() {
@@ -34,20 +27,7 @@ export default function SiteHeader() {
 
         {/* Desktop nav */}
         <nav className="hidden sm:flex items-center gap-1">
-          {navItems.map((item) =>
-            item.disabled ? (
-              <span
-                key={item.label}
-                className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm text-muted-foreground cursor-not-allowed select-none"
-                title={item.tooltip}
-              >
-                <item.icon className="h-4 w-4" />
-                <span>{item.label}</span>
-                <span className="absolute -top-1 -right-1 text-[9px] bg-slate-200 text-slate-500 px-1.5 py-0.5 rounded-full leading-none">
-                  скоро
-                </span>
-              </span>
-            ) : (
+          {navItems.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
@@ -56,8 +36,7 @@ export default function SiteHeader() {
                 <item.icon className="h-4 w-4" />
                 <span>{item.label}</span>
               </a>
-            )
-          )}
+          ))}
         </nav>
 
         {/* Mobile hamburger */}
@@ -75,19 +54,7 @@ export default function SiteHeader() {
       {/* Mobile nav */}
       {mobileOpen && (
         <nav className="sm:hidden border-t bg-white px-4 pb-4 pt-2 space-y-1">
-          {navItems.map((item) =>
-            item.disabled ? (
-              <div
-                key={item.label}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-muted-foreground/60 cursor-not-allowed"
-              >
-                <item.icon className="h-4 w-4" />
-                <span>{item.label}</span>
-                <span className="ml-auto text-[9px] bg-slate-200 text-slate-500 px-1.5 py-0.5 rounded-full leading-none">
-                  скоро
-                </span>
-              </div>
-            ) : (
+          {navItems.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
@@ -97,8 +64,7 @@ export default function SiteHeader() {
                 <item.icon className="h-4 w-4" />
                 <span>{item.label}</span>
               </a>
-            )
-          )}
+          ))}
         </nav>
       )}
     </header>

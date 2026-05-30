@@ -30,6 +30,7 @@ import {
   BLOCK14_WORKED_EXAMPLES,
   BLOCK14_PRACTICE,
   BLOCK14_SUMMARY,
+  BLOCK_SUMMARY_META,
   type Block14Mechanism,
 } from '@/lib/lesson-data-30'
 import MechanismTrainer, { type MechanismOption, type PracticeItem } from '@/components/lesson-3005/MechanismTrainer'
@@ -353,20 +354,19 @@ export default function Block14Spelling() {
             {BLOCK14_HOW_TO_THINK.map((item, i) => (
               <Card key={i} className="overflow-hidden">
                 <CardContent className="p-4">
-                  <div className="flex gap-4 items-start">
+                  <div className="flex gap-3 items-start">
                     <div className="flex flex-col items-center gap-1 shrink-0">
                       <span className="flex items-center justify-center size-8 rounded-full bg-primary/10 text-primary text-sm font-bold">
-                        {item.step}
+                        {i + 1}
                       </span>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm text-muted-foreground mb-1 font-medium">Ситуация</p>
-                      <p className="text-sm font-semibold text-foreground leading-snug">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-foreground leading-snug break-words">
                         {item.step}
                       </p>
                       <div className="flex items-center gap-2 mt-2">
                         <ArrowRight className="size-4 text-emerald-500 shrink-0" />
-                        <p className="text-sm text-emerald-700 dark:text-emerald-400 font-medium">
+                        <p className="text-sm text-emerald-700 dark:text-emerald-400 font-medium break-words">
                           {item.action}
                         </p>
                       </div>
@@ -418,7 +418,7 @@ export default function Block14Spelling() {
           <Alert className="border-amber-300 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-800">
             <Sparkles className="size-4 text-amber-600 dark:text-amber-400" />
             <AlertDescription className="text-amber-700 dark:text-amber-400 text-sm">
-              Определите написание и механизм для каждого задания. Нужно пройти минимум 6 из 8.
+              Запишите правильное написание конструкции и выберите механизм.
             </AlertDescription>
           </Alert>
 
@@ -429,7 +429,8 @@ export default function Block14Spelling() {
             totalItems={BLOCK14_PRACTICE.length}
             minToComplete={6}
             answerPlaceholder="например: так же — раздельно"
-            answerLabel="Напишите слово / конструкцию с правильным написанием"
+            answerLabel="Запишите правильное написание конструкции"
+            instructionText="Запишите правильное написание конструкции и выберите механизм"
           />
         </FadeUp>
       )}
@@ -479,6 +480,24 @@ export default function Block14Spelling() {
             </CardContent>
           </Card>
 
+          {/* КЭС + Что повторить + Домашка */}
+          <Card className="border-emerald-200 dark:border-emerald-800">
+            <CardContent className="p-4 space-y-3">
+              <div>
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">КЭС</p>
+                <p className="text-sm text-foreground">{BLOCK_SUMMARY_META.block14.kes.join(', ')}</p>
+              </div>
+              <div>
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Что повторить</p>
+                <p className="text-sm text-foreground">{BLOCK_SUMMARY_META.block14.reviewTopics.join(', ')}</p>
+              </div>
+              <div>
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Домашка по теме</p>
+                <p className="text-sm text-foreground">{BLOCK_SUMMARY_META.block14.homeworkRef}</p>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Confirm block button */}
           {isSummaryConfirmed ? (
             <Button
@@ -487,7 +506,7 @@ export default function Block14Spelling() {
               className="w-full min-h-[48px] text-base"
             >
               <CheckCircle2 className="size-5 mr-2" />
-              Блок зафиксирован ✓
+              Итог зафиксировan ✓
             </Button>
           ) : (
             <Button
@@ -495,7 +514,7 @@ export default function Block14Spelling() {
               className="w-full min-h-[48px] text-base bg-emerald-600 hover:bg-emerald-700 text-white"
             >
               <CheckCircle2 className="size-5 mr-2" />
-              Зафиксировал блок
+              Зафиксировал итог
             </Button>
           )}
         </FadeUp>
@@ -504,38 +523,35 @@ export default function Block14Spelling() {
       <Separator />
 
       {/* Bottom bar — Complete Block */}
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <p className="text-sm text-muted-foreground">
-            {canComplete
-              ? 'Минимум 6 заданий пройдено. Готовы завершить блок?'
-              : `Осталось пройти ещё ${Math.max(0, 6 - answeredCount)} заданий для завершения`}
-          </p>
-          {canComplete && !allSectionsVisited && (
-            <p className="text-xs text-amber-600 dark:text-amber-400">
-              Совет: посетите все вкладки блока перед завершением
-            </p>
-          )}
+      {isCompleted ? (
+        <div className="flex items-center justify-center gap-2 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 p-3">
+          <CheckCircle2 className="size-5 text-emerald-600 dark:text-emerald-400" />
+          <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Блок завершён ✓</span>
         </div>
-        <Button
-          onClick={handleComplete}
-          disabled={isCompleted || !canComplete}
-          variant={isCompleted ? 'outline' : 'default'}
-          className="min-h-[44px]"
-        >
-          {isCompleted ? (
-            <>
-              <CheckCircle2 className="size-4 mr-2" />
-              Блок пройден
-            </>
-          ) : (
-            <>
-              <CheckCircle2 className="size-4 mr-2" />
-              Завершить блок
-            </>
-          )}
-        </Button>
-      </div>
+      ) : (
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div className="space-y-1">
+            <p className="text-sm text-muted-foreground">
+              {canComplete
+                ? 'Готовы завершить блок?'
+                : 'Пройдите минимум 6 из 8 заданий или зафиксируйте итог'}
+            </p>
+            {canComplete && !allSectionsVisited && (
+              <p className="text-xs text-amber-600 dark:text-amber-400">
+                Совет: посетите все вкладки блока перед завершением
+              </p>
+            )}
+          </div>
+          <Button
+            onClick={handleComplete}
+            disabled={!canComplete}
+            className="min-h-[44px]"
+          >
+            <CheckCircle2 className="size-4 mr-2" />
+            Завершить блок
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

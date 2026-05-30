@@ -153,7 +153,7 @@ export default function DashboardPage() {
               </Card>
             </a>
 
-            {/* Тест по заданиям — скоро */}
+            {/* Тест по заданиям — disabled */}
             <div className="relative">
               <Card className="border-0 shadow-sm h-full opacity-60 cursor-not-allowed">
                 <CardContent className="p-5 flex items-center gap-4">
@@ -165,13 +165,13 @@ export default function DashboardPage() {
                       Тест по заданиям
                     </h3>
                     <p className="text-xs text-muted-foreground/70 mt-0.5">
-                      В следующих обновлениях
+                       
                     </p>
                   </div>
                 </CardContent>
               </Card>
-              <span className="absolute top-3 right-3 text-[9px] bg-slate-200 text-slate-500 px-1.5 py-0.5 rounded-full leading-none">
-                скоро
+              <span className="absolute top-3 right-3">
+                <Lock className="h-3.5 w-3.5 text-slate-400" />
               </span>
             </div>
           </div>

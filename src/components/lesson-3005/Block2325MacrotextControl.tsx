@@ -79,6 +79,16 @@ export default function Block2325MacrotextControl() {
         </Badge>
       </div>
 
+      <Alert className="border-sky-300 bg-sky-50 dark:bg-sky-950/40 dark:border-sky-800">
+        <Lightbulb className="size-4 text-sky-600 dark:text-sky-400" />
+        <AlertTitle className="text-sky-800 dark:text-sky-300">
+          Дополнительный чек-лист 23–25
+        </AlertTitle>
+        <AlertDescription className="text-sky-700 dark:text-sky-400">
+          Это не практика, а напоминание перед отдельным макротекстом.
+        </AlertDescription>
+      </Alert>
+
       {/* Section tabs */}
       <div className="flex gap-1 rounded-lg bg-muted p-1">
         {sections.map((section) => {
