@@ -120,7 +120,7 @@ export default function DrillDashboard({ taskCounts, mechanismStats, onStartSess
                   </div>
 
                   {/* Error count info */}
-                  {isErrors && (
+                  {hasErrors && (
                     <p className="text-[10px] text-muted-foreground mt-2">
                       {hasErrors ? `${errorCount} заданий с ошибками` : 'Ошибок пока нет'}
                     </p>
