@@ -134,7 +134,10 @@ export function getDisplayContext(item: DrillItem): string {
 }
 
 export function getDisplayTarget(item: DrillItem): string {
-  // Target is always shown as-is (it's the word to analyze, not the answer)
+  // For task №5 (paronyms), the target IS the answer — hide it so the
+  // student must pick from answerChoices. Context masking replaces the
+  // uppercase word with ____; showing the target would give it away.
+  if (item.taskNumber === 5) return ''
   return item.target
 }
 

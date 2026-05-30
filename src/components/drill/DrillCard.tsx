@@ -140,10 +140,12 @@ export default function DrillCard({ item, index, totalInSession, onCheck, onDisa
           </p>
         )}
 
-        {/* Target */}
-        <div className="text-lg sm:text-xl font-bold text-center py-2">
-          {item.displayTarget}
-        </div>
+        {/* Target — hidden for №5 (target IS the answer) */}
+        {item.displayTarget && (
+          <div className="text-lg sm:text-xl font-bold text-center py-2">
+            {item.displayTarget}
+          </div>
+        )}
 
         {/* Prompt (display — overridden for №5) */}
         <p className="text-sm text-muted-foreground text-center">
