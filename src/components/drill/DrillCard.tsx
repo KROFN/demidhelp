@@ -5,10 +5,11 @@ import { FadeUp } from '@/lib/motion'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { CheckCircle2, XCircle, AlertTriangle } from 'lucide-react'
-import type { DrillItem, DrillResultStatus } from '@/lib/drill/drill-types'
+import { CheckCircle2, XCircle, AlertTriangle, Flag, X } from 'lucide-react'
+import type { DrillResultStatus } from '@/lib/drill/drill-types'
 import { TASK_META, computeResultStatus } from '@/lib/drill/drill-types'
-import { useDrillProgressStore } from '@/lib/drill/drill-store'
+import type { DisplayDrillItem } from '@/lib/drill/drill-display-normalizer'
+import { useDrillProgressStore, type DrillIssueReason } from '@/lib/drill/drill-store'
 import {
   getVisibleMechanismChoices,
   isMechanismCorrect,
@@ -17,15 +18,31 @@ import {
   getMechanismSupplementaryHint,
 } from '@/lib/drill/drill-mechanism-normalizer'
 
+// ─── Issue report reasons ──────────────────────────────────────────────────
+
+const ISSUE_REASONS: { value: DrillIssueReason; label: string }[] = [
+  { value: 'wrong-answer', label: 'неверный ответ' },
+  { value: 'wrong-mechanism', label: 'неверный механизм' },
+  { value: 'bad-explanation', label: 'кривое объяснение' },
+  { value: 'bad-context', label: 'непонятный контекст' },
+  { value: 'duplicate', label: 'дубль' },
+  { value: 'other', label: 'другое' },
+]
+
+// ─── Props ─────────────────────────────────────────────────────────────────
+
 type Props = {
-  item: DrillItem
+  item: DisplayDrillItem
   index: number
   totalInSession: number
   onCheck: (status: DrillResultStatus) => void
+  onDisabled: () => void
 }
 
-export default function DrillCard({ item, index, totalInSession, onCheck }: Props) {
-  const { recordResult } = useDrillProgressStore()
+// ─── Component ─────────────────────────────────────────────────────────────
+
+export default function DrillCard({ item, index, totalInSession, onCheck, onDisabled }: Props) {
+  const { recordResult, disableItem } = useDrillProgressStore()
   const meta = TASK_META[item.taskNumber]
 
   const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null)
@@ -33,10 +50,18 @@ export default function DrillCard({ item, index, totalInSession, onCheck }: Prop
   const [checked, setChecked] = useState(false)
   const [resultStatus, setResultStatus] = useState<DrillResultStatus | null>(null)
 
+  // Report panel state
+  const [showReport, setShowReport] = useState(false)
+  const [reportReason, setReportReason] = useState<DrillIssueReason | null>(null)
+  const [reportComment, setReportComment] = useState('')
+
   // Use normalized mechanism choices
   const visibleMechanisms = useMemo(() => getVisibleMechanismChoices(item), [item])
   const correctMechNorm = useMemo(() => getCorrectNormalizedMechanismText(item), [item])
   const supplementaryHint = useMemo(() => getMechanismSupplementaryHint(item), [item])
+
+  // Use display answer choices (shuffled)
+  const answerChoices = item.displayAnswerChoices
 
   const canCheck = selectedAnswerId !== null && selectedMechanismId !== null && !checked
 
@@ -61,6 +86,33 @@ export default function DrillCard({ item, index, totalInSession, onCheck }: Prop
     onCheck(status)
   }, [selectedAnswerId, selectedMechanismId, item, recordResult, onCheck])
 
+  const handleDisable = useCallback(() => {
+    if (!reportReason) return
+    disableItem(
+      item.id,
+      item.taskNumber,
+      item.target,
+      item.context,
+      reportReason,
+      reportComment || undefined,
+      {
+        answerChoices: item.answerChoices,
+        mechanismChoices: item.mechanismChoices,
+        correctAnswerId: item.correctAnswerId,
+        correctMechanismId: item.correctMechanismId,
+        correctAnswerText: item.correctAnswerText,
+        correctMechanismText: item.correctMechanismText,
+        explanation: item.explanation,
+        wrongPathHint: item.wrongPathHint,
+        source: item.source,
+      }
+    )
+    setShowReport(false)
+    setReportReason(null)
+    setReportComment('')
+    onDisabled()
+  }, [item, reportReason, reportComment, disableItem, onDisabled])
+
   // Get selected mechanism display text for results
   const selectedMechDisplayText = selectedMechanismId
     ? getSelectedNormalizedMechanismText(item, selectedMechanismId)
@@ -81,30 +133,30 @@ export default function DrillCard({ item, index, totalInSession, onCheck }: Prop
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Context */}
-        {item.context && (
+        {/* Context (display — masked for №5) */}
+        {item.displayContext && (
           <p className="text-sm text-muted-foreground italic">
-            {item.context}
+            {item.displayContext}
           </p>
         )}
 
         {/* Target */}
         <div className="text-lg sm:text-xl font-bold text-center py-2">
-          {item.target}
+          {item.displayTarget}
         </div>
 
-        {/* Prompt */}
+        {/* Prompt (display — overridden for №5) */}
         <p className="text-sm text-muted-foreground text-center">
-          {item.prompt}
+          {item.displayPrompt}
         </p>
 
-        {/* Answer choices */}
+        {/* Answer choices (display — shuffled) */}
         <div className="space-y-2">
           <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
             Выбери ответ
           </label>
           <div className="flex flex-wrap gap-2">
-            {item.answerChoices.map((choice) => {
+            {answerChoices.map((choice) => {
               const isSelected = selectedAnswerId === choice.id
               const isCorrect = checked && choice.id === item.correctAnswerId
               const isWrong = checked && isSelected && choice.id !== item.correctAnswerId
@@ -289,6 +341,78 @@ export default function DrillCard({ item, index, totalInSession, onCheck }: Prop
                 )}
               </div>
             )}
+          </FadeUp>
+        )}
+
+        {/* Report / disable button */}
+        {!showReport && (
+          <button
+            onClick={() => setShowReport(true)}
+            className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-rose-500 transition-colors mx-auto mt-1"
+          >
+            <Flag className="h-3 w-3" />
+            Сообщить об ошибке / отключить
+          </button>
+        )}
+
+        {/* Report panel */}
+        {showReport && (
+          <FadeUp duration={0.2}>
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold">Что не так с заданием?</p>
+                <button onClick={() => setShowReport(false)} className="text-muted-foreground hover:text-foreground">
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+
+              <div className="flex flex-wrap gap-1.5">
+                {ISSUE_REASONS.map((r) => (
+                  <button
+                    key={r.value}
+                    onClick={() => setReportReason(r.value)}
+                    className={`px-2 py-1 rounded text-[10px] border transition-colors ${
+                      reportReason === r.value
+                        ? 'bg-rose-100 border-rose-300 text-rose-700'
+                        : 'bg-white border-slate-200 text-muted-foreground hover:border-slate-300'
+                    }`}
+                  >
+                    {r.label}
+                  </button>
+                ))}
+              </div>
+
+              <textarea
+                placeholder="Комментарий (необязательно)"
+                value={reportComment}
+                onChange={(e) => setReportComment(e.target.value)}
+                className="w-full text-xs border rounded p-2 min-h-[48px] resize-none bg-white"
+              />
+
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  disabled={!reportReason}
+                  onClick={handleDisable}
+                  className="flex-1 text-xs"
+                >
+                  Отключить это задание
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setShowReport(false)
+                    setReportReason(null)
+                    setReportComment('')
+                  }}
+                  className="flex-1 text-xs"
+                >
+                  Отмена
+                </Button>
+              </div>
+            </div>
           </FadeUp>
         )}
       </CardContent>

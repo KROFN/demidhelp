@@ -40,14 +40,24 @@ export function shuffleItems<T>(items: T[]): T[] {
   return arr
 }
 
+// ─── Disabled items filter ─────────────────────────────────────────────────
+
+function filterDisabled(items: DrillItem[], disabledIds: Record<string, true>): DrillItem[] {
+  return items.filter((i) => !disabledIds[i.id])
+}
+
 // ─── Error items ───────────────────────────────────────────────────────────
 
 export function getErrorItems(
   items: DrillItem[],
   taskNumber: number,
-  progress: Record<string, DrillItemProgress>
+  progress: Record<string, DrillItemProgress>,
+  disabledIds?: Record<string, true>
 ): DrillItem[] {
-  const taskItems = getItemsByTask(items, taskNumber)
+  let taskItems = getItemsByTask(items, taskNumber)
+  if (disabledIds) {
+    taskItems = filterDisabled(taskItems, disabledIds)
+  }
   const wrong: DrillItem[] = []
   const guessed: DrillItem[] = []
 
@@ -71,20 +81,24 @@ export function createSession(
   items: DrillItem[],
   taskNumber: number,
   mode: DrillMode,
-  progress: Record<string, DrillItemProgress>
+  progress: Record<string, DrillItemProgress>,
+  disabledIds?: Record<string, true>
 ): DrillItem[] {
   const config = DRILL_MODE_CONFIG[mode]
 
   if (mode === 'errors') {
-    const errorItems = getErrorItems(items, taskNumber, progress)
+    const errorItems = getErrorItems(items, taskNumber, progress, disabledIds)
     // Shuffle error items, take up to config.size
     return shuffleItems(errorItems).slice(0, config.size)
   }
 
-  // quick/normal/massacre: only needsManualReview === false, shuffle, slice
-  const taskItems = getItemsByTask(items, taskNumber).filter(
-    (i) => !i.needsManualReview
-  )
+  // quick/normal/massacre: filter disabled + needsManualReview, shuffle, slice
+  let taskItems = getItemsByTask(items, taskNumber)
+    .filter((i) => !i.needsManualReview)
+
+  if (disabledIds) {
+    taskItems = filterDisabled(taskItems, disabledIds)
+  }
 
   return shuffleItems(taskItems).slice(0, config.size)
 }

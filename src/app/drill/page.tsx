@@ -37,7 +37,7 @@ export default function DrillPage() {
   const [sessionItems, setSessionItems] = useState<DrillItem[]>([])
   const [sessionResults, setSessionResults] = useState<SessionItemResult[]>([])
 
-  const { byItemId } = useDrillProgressStore()
+  const { byItemId, disabledItemIds } = useDrillProgressStore()
 
   // Load data
   useEffect(() => {
@@ -79,9 +79,9 @@ export default function DrillPage() {
   const handleStartSession = useCallback(
     (taskNumber: number, mode: DrillMode) => {
       if (!data) return
-      const items = createSession(data.drillItems, taskNumber, mode, byItemId)
+      const items = createSession(data.drillItems, taskNumber, mode, byItemId, disabledItemIds)
       if (items.length === 0) {
-        // No items available (e.g., no errors)
+        // No items available (e.g., no errors or all disabled)
         return
       }
       setSessionTask(taskNumber)
@@ -90,7 +90,7 @@ export default function DrillPage() {
       setSessionResults([])
       setScreen('session')
     },
-    [data, byItemId]
+    [data, byItemId, disabledItemIds]
   )
 
   const handleSessionFinish = useCallback((results: SessionItemResult[]) => {
@@ -100,21 +100,21 @@ export default function DrillPage() {
 
   const handleRetryErrors = useCallback(() => {
     if (!data) return
-    const items = createSession(data.drillItems, sessionTask, 'errors', byItemId)
+    const items = createSession(data.drillItems, sessionTask, 'errors', byItemId, disabledItemIds)
     if (items.length === 0) return
     setSessionItems(items)
     setSessionResults([])
     setSessionMode('errors')
     setScreen('session')
-  }, [data, sessionTask, byItemId])
+  }, [data, sessionTask, byItemId, disabledItemIds])
 
   const handleRetrySame = useCallback(() => {
     if (!data) return
-    const items = createSession(data.drillItems, sessionTask, sessionMode, byItemId)
+    const items = createSession(data.drillItems, sessionTask, sessionMode, byItemId, disabledItemIds)
     setSessionItems(items)
     setSessionResults([])
     setScreen('session')
-  }, [data, sessionTask, sessionMode, byItemId])
+  }, [data, sessionTask, sessionMode, byItemId, disabledItemIds])
 
   const handleBackToDashboard = useCallback(() => {
     setScreen('dashboard')

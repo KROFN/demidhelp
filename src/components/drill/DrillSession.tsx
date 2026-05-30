@@ -1,19 +1,18 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
-import { FadeUp, AnimatedWidth } from '@/lib/motion'
+import React, { useState, useCallback, useMemo } from 'react'
+import { FadeUp } from '@/lib/motion'
 import { Progress } from '@/components/ui/progress'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
-  CheckCircle2,
-  XCircle,
-  AlertTriangle,
   ChevronLeft,
   LogOut,
 } from 'lucide-react'
 import type { DrillItem, DrillMode, DrillResultStatus, SessionItemResult } from '@/lib/drill/drill-types'
 import { TASK_META, DRILL_MODE_CONFIG } from '@/lib/drill/drill-types'
+import type { DisplayDrillItem } from '@/lib/drill/drill-display-normalizer'
+import { createDisplayItem, createSessionSeed } from '@/lib/drill/drill-display-normalizer'
 import DrillCard from './DrillCard'
 
 type Props = {
@@ -32,11 +31,20 @@ export default function DrillSession({ items, taskNumber, mode, onFinish, onExit
   const [results, setResults] = useState<SessionItemResult[]>([])
   const [confirmExit, setConfirmExit] = useState(false)
 
+  // Create session seed once — stable for the entire session
+  const [sessionSeed] = useState(() => createSessionSeed())
+
+  // Build display items with masked context + shuffled choices
+  const displayItems: DisplayDrillItem[] = useMemo(
+    () => items.map((item, index) => createDisplayItem(item, sessionSeed, index)),
+    [items, sessionSeed]
+  )
+
   const knownCount = results.filter((r) => r.status === 'known').length
   const guessedCount = results.filter((r) => r.status === 'guessed').length
   const wrongCount = results.filter((r) => r.status === 'wrong').length
 
-  const currentItem = items[currentIndex]
+  const currentItem = displayItems[currentIndex]
   const isLastItem = currentIndex >= items.length - 1
 
   const handleCheck = useCallback(
@@ -44,7 +52,7 @@ export default function DrillSession({ items, taskNumber, mode, onFinish, onExit
       const result: SessionItemResult = {
         itemId: currentItem.id,
         taskNumber: currentItem.taskNumber,
-        selectedAnswerId: '', // DrillCard handles recording internally
+        selectedAnswerId: '',
         selectedMechanismId: '',
         status,
         checkedAt: Date.now(),
@@ -61,6 +69,18 @@ export default function DrillSession({ items, taskNumber, mode, onFinish, onExit
       setCurrentIndex((prev) => prev + 1)
     }
   }, [isLastItem, onFinish, results])
+
+  const handleDisabled = useCallback(() => {
+    // If item was disabled and not yet checked, skip to next
+    const hasChecked = results[currentIndex] !== undefined
+    if (!hasChecked) {
+      if (isLastItem) {
+        onFinish(results)
+      } else {
+        setCurrentIndex((prev) => prev + 1)
+      }
+    }
+  }, [currentIndex, results, isLastItem, onFinish])
 
   const currentResult = results[currentIndex]
   const hasCheckedCurrent = currentResult !== undefined
@@ -111,6 +131,7 @@ export default function DrillSession({ items, taskNumber, mode, onFinish, onExit
         index={currentIndex}
         totalInSession={items.length}
         onCheck={handleCheck}
+        onDisabled={handleDisabled}
       />
 
       {/* Next / Finish button */}

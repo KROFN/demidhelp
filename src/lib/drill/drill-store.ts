@@ -8,19 +8,66 @@ import type {
   DrillSessionSummary,
   SessionItemResult,
 } from './drill-types'
+import type { DrillChoice } from './drill-types'
 import { computeResultStatus } from './drill-types'
+
+// ─── Issue report types ────────────────────────────────────────────────────
+
+export type DrillIssueReason =
+  | 'wrong-answer'
+  | 'wrong-mechanism'
+  | 'bad-explanation'
+  | 'bad-context'
+  | 'duplicate'
+  | 'other'
+
+export type DrillIssueReport = {
+  id: string
+  itemId: string
+  taskNumber: number
+  target: string
+  context: string
+  reason: DrillIssueReason
+  comment?: string
+  createdAt: string
+  itemSnapshot: {
+    answerChoices: DrillChoice[]
+    mechanismChoices: DrillChoice[]
+    correctAnswerId: string
+    correctMechanismId: string
+    correctAnswerText: string
+    correctMechanismText: string
+    explanation: string
+    wrongPathHint: string
+    source?: { type: string; rawId: string; sourceDocument: string; sourceTaskNumber: number }
+  }
+}
 
 // ─── State shape ───────────────────────────────────────────────────────────
 
 export type DrillProgressState = {
   byItemId: Record<string, DrillItemProgress>
   sessions: DrillSessionSummary[]
+  disabledItemIds: Record<string, true>
+  issueReports: DrillIssueReport[]
 
   // Actions
   recordResult: (result: SessionItemResult) => void
   addSession: (session: DrillSessionSummary) => void
   getErrorsForTask: (taskNumber: number) => DrillItemProgress[]
   getProgressForTask: (taskNumber: number) => DrillItemProgress[]
+  disableItem: (
+    itemId: string,
+    taskNumber: number,
+    target: string,
+    context: string,
+    reason: DrillIssueReason,
+    comment: string | undefined,
+    itemSnapshot: DrillIssueReport['itemSnapshot']
+  ) => void
+  enableItem: (itemId: string) => void
+  clearIssueReports: () => void
+  exportIssueReports: () => string
   resetAll: () => void
 }
 
@@ -31,6 +78,8 @@ export const useDrillProgressStore = create<DrillProgressState>()(
     (set, get) => ({
       byItemId: {},
       sessions: [],
+      disabledItemIds: {},
+      issueReports: [],
 
       recordResult: (result: SessionItemResult) => {
         set((state) => {
@@ -97,8 +146,51 @@ export const useDrillProgressStore = create<DrillProgressState>()(
         return Object.values(byItemId).filter((p) => p.taskNumber === taskNumber)
       },
 
+      disableItem: (
+        itemId: string,
+        taskNumber: number,
+        target: string,
+        context: string,
+        reason: DrillIssueReason,
+        comment: string | undefined,
+        itemSnapshot: DrillIssueReport['itemSnapshot']
+      ) => {
+        const report: DrillIssueReport = {
+          id: `report-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          itemId,
+          taskNumber,
+          target,
+          context,
+          reason,
+          comment,
+          createdAt: new Date().toISOString(),
+          itemSnapshot,
+        }
+
+        set((state) => ({
+          disabledItemIds: { ...state.disabledItemIds, [itemId]: true },
+          issueReports: [...state.issueReports, report],
+        }))
+      },
+
+      enableItem: (itemId: string) => {
+        set((state) => {
+          const { [itemId]: _, ...rest } = state.disabledItemIds
+          return { disabledItemIds: rest }
+        })
+      },
+
+      clearIssueReports: () => {
+        set({ issueReports: [] })
+      },
+
+      exportIssueReports: () => {
+        const { issueReports } = get()
+        return JSON.stringify(issueReports, null, 2)
+      },
+
       resetAll: () => {
-        set({ byItemId: {}, sessions: [] })
+        set({ byItemId: {}, sessions: [], disabledItemIds: {}, issueReports: [] })
       },
     }),
     {
@@ -106,6 +198,8 @@ export const useDrillProgressStore = create<DrillProgressState>()(
       partialize: (state) => ({
         byItemId: state.byItemId,
         sessions: state.sessions,
+        disabledItemIds: state.disabledItemIds,
+        issueReports: state.issueReports,
       }),
     }
   )
@@ -125,8 +219,6 @@ export function checkAndRecord(
   recordResult: (r: SessionItemResult) => void
 ): DrillResultStatus {
   const answerCorrect = selectedAnswerId === correctAnswerId
-  // Legacy: raw ID comparison — callers should use DrillCard's
-  // normalized check instead for tasks 4/5
   const mechanismCorrect = selectedMechanismId === correctMechanismId
   const status = computeResultStatus(answerCorrect, mechanismCorrect)
 
